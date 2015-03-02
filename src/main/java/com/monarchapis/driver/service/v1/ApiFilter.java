@@ -109,37 +109,35 @@ public class ApiFilter implements Filter {
 					operationName = "unknown";
 				}
 
-				if (applicationId != null && clientId != null) {
-					long requestSize = (long) request.getDataSize();
-					long responseSize = (long) response.getDataSize();
+				long requestSize = (long) request.getDataSize();
+				long responseSize = (long) response.getDataSize();
 
-					ObjectNode event = JsonNodeFactory.instance.objectNode();
-					event.put("request_id", request.getRequestId());
-					event.put("application_id", applicationId);
-					event.put("client_id", clientId);
-					event.put("service_id", serviceId);
-					event.put("service_version", "1"); // TODO
-					event.put("operation_name", operationName);
-					event.put("provider_id", providerId);
-					event.put("request_size", requestSize);
-					event.put("response_size", responseSize);
-					event.put("response_time", ms);
-					event.put("status_code", error == null ? 200 : error.getCode());
-					event.put("error_reason", error == null ? "ok" : error.getReason());
-					event.put("cache_hit", false);
-					event.put("token_id", context.getToken() != null ? context.getToken().getId() : null);
-					event.put("user_id", context.getPrincipal() != null ? context.getPrincipal().getId() : null);
-					event.put("host", request.getServerName());
-					event.put("path", request.getRequestURL().toString());
-					event.put("port", request.getServerPort());
-					event.put("verb", request.getMethod());
-					event.set("parameters", getParameters(request));
-					event.set("headers", getHeaders(request));
-					event.put("client_ip", request.getIpAddress());
-					event.put("user_agent", request.getHeader("User-Agent"));
+				ObjectNode event = JsonNodeFactory.instance.objectNode();
+				event.put("request_id", request.getRequestId());
+				event.put("application_id", applicationId);
+				event.put("client_id", clientId);
+				event.put("service_id", serviceId);
+				event.put("service_version", "1"); // TODO
+				event.put("operation_name", operationName);
+				event.put("provider_id", providerId);
+				event.put("request_size", requestSize);
+				event.put("response_size", responseSize);
+				event.put("response_time", ms);
+				event.put("status_code", error == null ? 200 : error.getCode());
+				event.put("error_reason", error == null ? "ok" : error.getReason());
+				event.put("cache_hit", false);
+				event.put("token_id", context.getToken() != null ? context.getToken().getId() : null);
+				event.put("user_id", context.getPrincipal() != null ? context.getPrincipal().getId() : null);
+				event.put("host", request.getServerName());
+				event.put("path", request.getRequestURI());
+				event.put("port", request.getServerPort());
+				event.put("verb", request.getMethod());
+				event.set("parameters", getParameters(request));
+				event.set("headers", getHeaders(request));
+				event.put("client_ip", request.getIpAddress());
+				event.put("user_agent", request.getHeader("User-Agent"));
 
-					analyticsApi.event("traffic", event);
-				}
+				analyticsApi.event("traffic", event);
 			}
 		} catch (Throwable e) {
 			logger.error("Could not send API hit result", e);
