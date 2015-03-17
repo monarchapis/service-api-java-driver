@@ -33,6 +33,7 @@ import com.monarchapis.driver.model.HasherAlgorithm;
 import com.monarchapis.driver.model.HttpResponseHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
 import com.monarchapis.driver.model.ServiceInfo;
+import com.monarchapis.driver.model.VersionHolder;
 import com.monarchapis.driver.service.v1.impl.AnalyticsApiDriver;
 import com.monarchapis.driver.service.v1.impl.EventsApiDriver;
 import com.monarchapis.driver.service.v1.impl.OpenApiDriver;
@@ -65,6 +66,7 @@ public class ApiFilter implements Filter {
 		try {
 			HttpResponseHolder.setCurrent(apiResponse);
 			ApiRequest.setCurrent(apiRequest);
+			VersionHolder.setCurrent("1"); // Default
 
 			chain.doFilter(apiRequest, apiResponse);
 		} finally {
@@ -78,6 +80,7 @@ public class ApiFilter implements Filter {
 			ApiRequest.remove();
 			HttpResponseHolder.remove();
 			OperationNameHolder.remove();
+			VersionHolder.remove();
 			ErrorHolder.remove();
 		}
 	}
@@ -101,6 +104,7 @@ public class ApiFilter implements Filter {
 				String serviceId = serviceInfo.getService().getId();
 				String providerId = serviceInfo.getProvider().getId();
 				String operationName = OperationNameHolder.getCurrent();
+				String version = VersionHolder.getCurrent();
 				String applicationId = context.getApplication() != null ? context.getApplication().getId() : null;
 				String clientId = context.getClient() != null ? context.getClient().getId() : null;
 				ApiError error = ErrorHolder.getCurrent();
@@ -117,7 +121,7 @@ public class ApiFilter implements Filter {
 				event.put("application_id", applicationId);
 				event.put("client_id", clientId);
 				event.put("service_id", serviceId);
-				event.put("service_version", "1"); // TODO
+				event.put("service_version", version);
 				event.put("operation_name", operationName);
 				event.put("provider_id", providerId);
 				event.put("request_size", requestSize);

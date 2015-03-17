@@ -1,6 +1,6 @@
 package com.monarchapis.driver.model;
 
-public abstract class OperationNameHolder {
+public abstract class VersionHolder {
 	private static InheritableThreadLocal<String> current = new InheritableThreadLocal<String>();
 
 	public static String getCurrent() {

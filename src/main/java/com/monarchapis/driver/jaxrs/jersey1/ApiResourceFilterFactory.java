@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.monarchapis.driver.annotation.ApiOperation;
+import com.monarchapis.driver.annotation.ApiVersion;
 import com.monarchapis.driver.annotation.Authorize;
 import com.monarchapis.driver.annotation.RequestWeight;
 import com.sun.jersey.api.model.AbstractMethod;
@@ -22,6 +23,24 @@ public class ApiResourceFilterFactory implements ResourceFilterFactory {
 		ApiOperation apiOperation = am.getAnnotation(ApiOperation.class);
 		String operation = apiOperation != null ? apiOperation.value() : am.getMethod().getName();
 		filters.add((ResourceFilter) new OperationNameResourceFilter(operation));
+		
+		ApiVersion apiVersion = null;
+
+		if (am.isAnnotationPresent(ApiVersion.class)) {
+			apiVersion = am.getAnnotation(ApiVersion.class);
+		}
+		
+		if (apiVersion == null) {
+			AbstractResource ar = am.getResource();
+
+			if (ar.isAnnotationPresent(ApiVersion.class)) {
+				apiVersion = ar.getAnnotation(ApiVersion.class);
+			}
+		}
+		
+		if (apiVersion != null) {
+			filters.add((ResourceFilter) new VersionResourceFilter(apiVersion.value()));
+		}
 
 		Authorize authorize = null;
 
