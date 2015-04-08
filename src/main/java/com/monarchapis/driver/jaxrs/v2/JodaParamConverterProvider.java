@@ -13,7 +13,6 @@ import org.joda.time.format.ISODateTimeFormat;
 
 @Provider
 public class JodaParamConverterProvider implements ParamConverterProvider {
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> ParamConverter<T> getConverter(Class<T> type, Type genericType, Annotation[] annotations) {
@@ -24,7 +23,6 @@ public class JodaParamConverterProvider implements ParamConverterProvider {
 		} else {
 			return null;
 		}
-
 	}
 
 	private static class DateTimeParamConverter implements ParamConverter<DateTime> {

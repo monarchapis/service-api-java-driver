@@ -4,10 +4,18 @@ public class ForbiddenException extends ApiErrorException {
 	private static final long serialVersionUID = 7343066763779729612L;
 
 	public ForbiddenException() {
-		this("Access denied", "Your client is not authorized to make this request.", "SEC-0001", null);
+		super("forbidden");
 	}
 
-	public ForbiddenException(String message, String developerMessage, String errorCode, String moreInfo) {
-		super(403, "forbidden", message, developerMessage, errorCode, moreInfo);
+	public ForbiddenException(Throwable t) {
+		super("forbidden", t);
+	}
+
+	public ForbiddenException(String template, String... args) {
+		super("forbidden", template, args);
+	}
+
+	public ForbiddenException(Throwable t, String template, String... args) {
+		super("forbidden", t, template, args);
 	}
 }

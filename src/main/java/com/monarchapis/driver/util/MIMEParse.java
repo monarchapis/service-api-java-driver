@@ -27,7 +27,6 @@ import org.apache.commons.lang3.math.NumberUtils;
  * 
  */
 public final class MIMEParse {
-
 	/**
 	 * Parse results container
 	 */
@@ -209,7 +208,6 @@ public final class MIMEParse {
 	public static String bestMatch(Collection<String> supported, String header) {
 		List<ParseResults> parseResults = new LinkedList<ParseResults>();
 		List<FitnessAndQuality> weightedMatches = new LinkedList<FitnessAndQuality>();
-
 		for (String r : StringUtils.split(header, ','))
 			parseResults.add(parseMediaRange(r));
 
@@ -218,11 +216,10 @@ public final class MIMEParse {
 			fitnessAndQuality.mimeType = s;
 			weightedMatches.add(fitnessAndQuality);
 		}
-
 		Collections.sort(weightedMatches);
 
 		FitnessAndQuality lastOne = weightedMatches.get(weightedMatches.size() - 1);
-		return lastOne.quality != 0 ? lastOne.mimeType : null;
+		return lastOne.quality != 0 ? lastOne.mimeType : "";
 	}
 
 	// hidden

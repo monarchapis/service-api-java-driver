@@ -7,6 +7,7 @@ import javax.ws.rs.ext.Provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
 @Provider
@@ -17,8 +18,8 @@ public class JacksonContextResolver implements ContextResolver<ObjectMapper> {
 	public JacksonContextResolver() {
 		mapper = new ObjectMapper();
 
-		JodaModule jodaModule = new JodaModule();
-		mapper.registerModule(jodaModule);
+		mapper.registerModule(new JodaModule());
+		mapper.registerModule(new GuavaModule());
 
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 	}

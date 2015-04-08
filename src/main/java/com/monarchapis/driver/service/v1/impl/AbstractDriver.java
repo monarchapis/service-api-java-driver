@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,12 +25,12 @@ import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.monarchapis.driver.authentication.AuthenticationSigner;
-import com.monarchapis.driver.authentication.ProviderCredentials;
+import com.monarchapis.driver.exception.ApiError;
+import com.monarchapis.driver.exception.ApiErrorException;
 import com.monarchapis.driver.exception.ApiException;
-import com.monarchapis.driver.util.ErrorUtils;
+import com.monarchapis.driver.model.ProviderCredentials;
 
 public class AbstractDriver {
-	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(AbstractDriver.class);
 
 	private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
@@ -38,28 +41,22 @@ public class AbstractDriver {
 	protected static String PATCH = "PATCH";
 	protected static String DELETE = "DELETE";
 
+	private HttpRequestFactory requestFactory;
+
 	private String baseUrl;
+
+	@Inject
 	private ProviderCredentials providerCredentials;
 
-	protected HttpRequestFactory requestFactory;
-
+	@Inject
 	private AuthenticationSigner authenticationSigner;
 
-	public AbstractDriver(String baseUrl, ProviderCredentials providerCredentials) {
-		this(baseUrl, providerCredentials, null);
+	public AbstractDriver() {
+		requestFactory = HTTP_TRANSPORT.createRequestFactory();
 	}
 
-	public AbstractDriver(String baseUrl, ProviderCredentials providerCredentials,
-			AuthenticationSigner authenticationSigner) {
-		if (baseUrl == null) {
-			throw new IllegalArgumentException("baseUrl is required.");
-		}
-
-		this.baseUrl = baseUrl;
-		this.providerCredentials = providerCredentials;
-		this.authenticationSigner = authenticationSigner;
-
-		requestFactory = HTTP_TRANSPORT.createRequestFactory();
+	protected HttpRequestFactory getRequestFactory() {
+		return requestFactory;
 	}
 
 	protected <T> T executeJsonRequest(String method, String url, Class<T> clazz) {
@@ -118,7 +115,7 @@ public class AbstractDriver {
 
 			return request.execute();
 		} catch (HttpResponseException hre) {
-			throw ErrorUtils.processApiError(hre);
+			throw processApiError(hre);
 		} catch (IOException e) {
 			throw new ApiException("Error processing authorization", e);
 		}
@@ -130,7 +127,7 @@ public class AbstractDriver {
 
 			return request.execute();
 		} catch (HttpResponseException hre) {
-			throw ErrorUtils.processApiError(hre);
+			throw processApiError(hre);
 		} catch (IOException e) {
 			throw new ApiException("Error processing request", e);
 		}
@@ -142,7 +139,7 @@ public class AbstractDriver {
 
 			return request.execute();
 		} catch (HttpResponseException hre) {
-			throw ErrorUtils.processApiError(hre);
+			throw processApiError(hre);
 		} catch (IOException e) {
 			throw new ApiException("Error processing authorization", e);
 		}
@@ -228,23 +225,55 @@ public class AbstractDriver {
 		}
 	}
 
+	private static ApiException processApiError(HttpResponseException hre) {
+		ApiError error = parseApiError(hre);
+
+		return (error != null) ? new ApiErrorException(error) : new ApiException("Could not process error response");
+	}
+
+	private static ApiError parseApiError(HttpResponseException hre) {
+		ApiError error = null;
+		String content = null;
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			content = hre.getContent();
+
+			if (content != null) {
+				error = mapper.readValue(content, ApiError.class);
+			}
+		} catch (IOException ioe) {
+			// Ignore and fall through
+			logger.error("Could not read error response: {}", content);
+		}
+
+		return error;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl;
+	}
+
+	public void setBaseUrl(String baseUrl) {
+		Validate.notNull(baseUrl, "baseUrl is required.");
+		this.baseUrl = baseUrl;
+	}
+
+	public ProviderCredentials getProviderCredentials() {
+		return providerCredentials;
+	}
+
+	public void setProviderCredentials(ProviderCredentials providerCredentials) {
+		Validate.notNull(providerCredentials, "providerCredentials is required.");
+		this.providerCredentials = providerCredentials;
+	}
+
 	public AuthenticationSigner getAuthenticationSigner() {
 		return authenticationSigner;
 	}
 
 	public void setAuthenticationSigner(AuthenticationSigner authenticationSigner) {
 		this.authenticationSigner = authenticationSigner;
-	}
-
-	protected static class GetIdResponse {
-		private String id;
-
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
 	}
 }

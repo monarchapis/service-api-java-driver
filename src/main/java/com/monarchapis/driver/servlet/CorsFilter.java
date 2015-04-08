@@ -2,6 +2,7 @@ package com.monarchapis.driver.servlet;
 
 import java.io.IOException;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -10,8 +11,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class CorsFilter implements javax.servlet.Filter {
-	private String allowOrigin;
+public class CorsFilter implements Filter {
+	private String allowOrigins;
 	private String allowMethods;
 	private String allowHeaders;
 
@@ -34,7 +35,7 @@ public class CorsFilter implements javax.servlet.Filter {
 		} else {
 			// Some browsers don't like * with allowCredentials=true so just
 			// echo back the Origin.
-			res.setHeader("Access-Control-Allow-Origin", allowOrigin.equals("*") ? origin : allowOrigin);
+			res.setHeader("Access-Control-Allow-Origin", allowOrigins.equals("*") ? origin : allowOrigins);
 			res.setHeader("Access-Control-Allow-Methods", allowMethods);
 			res.setHeader("Access-Control-Allow-Headers", allowHeaders);
 			res.setHeader("Access-Control-Max-Age", "1728000");
@@ -53,7 +54,7 @@ public class CorsFilter implements javax.servlet.Filter {
 
 	@Override
 	public void init(FilterConfig config) throws ServletException {
-		allowOrigin = getInitParameter(config, "allowMethods", "*");
+		allowOrigins = getInitParameter(config, "allowOrigins", "*");
 		allowMethods = getInitParameter(config, "allowMethods", "GET, POST, HEAD, OPTIONS, DELETE, PUT, PATCH");
 		allowHeaders = getInitParameter(
 				config,

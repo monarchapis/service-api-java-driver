@@ -21,35 +21,32 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		this.response = response;
 	}
 
-	public ServletOutputStreamWrapper createOutputStream() throws IOException {
-		try {
-			servletOutputStream = response.getOutputStream();
-			return new ServletOutputStreamWrapper(servletOutputStream);
-		} catch (Exception ex) {
-			throw new IOException("Unable to construct servlet output stream: " + ex.getMessage(), ex);
-		}
-	}
-
-	public void finishResponse() {
-		try {
-			if (writer != null) {
-				writer.close();
-			} else if (stream != null) {
-				stream.close();
-			}
-		} catch (IOException e) {
-		}
-	}
+	// public void finishResponse() {
+	// try {
+	// if (writer != null) {
+	// writer.close();
+	// } else if (stream != null) {
+	// stream.close();
+	// }
+	// } catch (IOException e) {
+	// }
+	// }
 
 	@Override
 	public void flushBuffer() throws IOException {
-		stream.flush();
+		if (stream != null) {
+			stream.flush();
+		}
+
+		if (writer != null) {
+			writer.flush();
+		}
 	}
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
 		if (writer != null) {
-			throw new IllegalStateException("getOutputStream() has already been called!");
+			throw new IllegalStateException("getWriter() has already been called!");
 		}
 
 		if (stream == null) {
@@ -75,9 +72,9 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		return (writer);
 	}
 
-	public OutputStream getServletOutputStream() {
-		return servletOutputStream;
-	}
+	// public OutputStream getServletOutputStream() {
+	// return servletOutputStream;
+	// }
 
 	public int getDataSize() {
 		int size = 0;
@@ -103,5 +100,14 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		}
 
 		return size;
+	}
+
+	private ServletOutputStreamWrapper createOutputStream() throws IOException {
+		try {
+			servletOutputStream = response.getOutputStream();
+			return new ServletOutputStreamWrapper(servletOutputStream);
+		} catch (Exception ex) {
+			throw new IOException("Unable to construct servlet output stream: " + ex.getMessage(), ex);
+		}
 	}
 }

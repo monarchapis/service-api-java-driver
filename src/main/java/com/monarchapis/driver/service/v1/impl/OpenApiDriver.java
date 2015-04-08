@@ -15,10 +15,6 @@ public class OpenApiDriver extends AbstractDriver implements OpenApi {
 	@SuppressWarnings("unused")
 	private static final Logger logger = LoggerFactory.getLogger(OpenApiDriver.class);
 
-	public OpenApiDriver(String url) {
-		super(url, null);
-	}
-
 	public ServiceInfo getServiceInfo(String environmentName, String serviceName, String providerKey) {
 		try {
 			StringBuilder sb = new StringBuilder("/open/v1/serviceInfo") //
@@ -36,7 +32,7 @@ public class OpenApiDriver extends AbstractDriver implements OpenApi {
 			}
 
 			GenericUrl genericUrl = createUrl(sb.toString());
-			HttpRequest request = requestFactory.buildGetRequest(genericUrl);
+			HttpRequest request = getRequestFactory().buildGetRequest(genericUrl);
 			HttpHeaders headers = request.getHeaders();
 			headers.setAccept("application/json");
 			headers.setContentEncoding("UTF-8");

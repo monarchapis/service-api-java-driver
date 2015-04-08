@@ -13,13 +13,13 @@ import javax.ws.rs.ext.Provider;
 import com.monarchapis.driver.annotation.ApiOperation;
 import com.monarchapis.driver.annotation.ApiVersion;
 import com.monarchapis.driver.annotation.Authorize;
+import com.monarchapis.driver.annotation.BypassAnalytics;
 import com.monarchapis.driver.annotation.RequestWeight;
+import com.monarchapis.driver.authentication.Authenticator;
 
 @Provider
 @PreMatching
 public class ApiDynamicFeature implements DynamicFeature {
-	private static final BigDecimal DEFAULT_WEIGHT = new BigDecimal(1);
-
 	@Override
 	public void configure(final ResourceInfo resourceInfo, FeatureContext configuration) {
 		Method method = resourceInfo.getResourceMethod();
@@ -34,11 +34,18 @@ public class ApiDynamicFeature implements DynamicFeature {
 			configuration.register(new VersionRequestFilter(apiVersion.value()));
 		}
 
+		BypassAnalytics bypassAnalytics = getAnnotation(method, BypassAnalytics.class);
+
+		if (bypassAnalytics != null) {
+			configuration.register(new BypassAnalyticsRequestFilter());
+		}
+
 		Authorize authorize = getAnnotation(method, Authorize.class);
 
 		if (authorize != null) {
 			RequestWeight requestWeight = method.getAnnotation(RequestWeight.class);
-			BigDecimal weight = requestWeight != null ? new BigDecimal(requestWeight.value()) : DEFAULT_WEIGHT;
+			BigDecimal weight = requestWeight != null ? new BigDecimal(requestWeight.value())
+					: Authenticator.NORMAL_WEIGHT;
 
 			configuration.register(new AuthorizeRequestFilter(authorize.client(), authorize.user(), authorize
 					.delegated(), authorize.claims(), weight));

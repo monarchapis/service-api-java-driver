@@ -12,8 +12,12 @@ import com.monarchapis.driver.annotation.ApiInject;
 public class ApiInjectionBinder extends AbstractBinder {
 	@Override
 	protected void configure() {
-		bind(ApiValueFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
-		bind(ApiValueFactoryProvider.InjectionResolver.class).to(new TypeLiteral<InjectionResolver<ApiInject>>() {
-		}).in(Singleton.class);
+		bind(ApiValueFactoryProvider.class) //
+				.to(ValueFactoryProvider.class) //
+				.in(Singleton.class);
+
+		bind(ApiValueFactoryProvider.InjectionResolver.class) //
+				.to(new TypeLiteral<InjectionResolver<ApiInject>>() {
+				}).in(Singleton.class);
 	}
 }

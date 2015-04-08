@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class ApiContext {
+	private static boolean autoCreate = true;
 	private static InheritableThreadLocal<ApiContext> current = new InheritableThreadLocal<ApiContext>();
 
 	private String correlationId;
@@ -22,10 +23,14 @@ public class ApiContext {
 		this.provider = from.provider;
 	}
 
+	public static void setAutoCreate(boolean autoCreate) {
+		ApiContext.autoCreate = autoCreate;
+	}
+
 	public static ApiContext getCurrent() {
 		ApiContext ret = current.get();
 
-		if (ret == null) {
+		if (ret == null && autoCreate) {
 			ret = new ApiContext();
 			current.set(ret);
 		}

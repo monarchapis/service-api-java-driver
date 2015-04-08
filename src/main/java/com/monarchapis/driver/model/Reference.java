@@ -4,6 +4,14 @@ public class Reference {
 	private String id;
 	private String name;
 
+	public Reference() {
+	}
+
+	public Reference(String id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
 	public String getId() {
 		return id;
 	}

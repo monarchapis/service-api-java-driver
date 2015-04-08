@@ -3,20 +3,12 @@ package com.monarchapis.driver.jaxrs.v2;
 import javax.ws.rs.NotAllowedException;
 import javax.ws.rs.ext.Provider;
 
+import com.monarchapis.driver.jaxrs.common.AbstractExceptionMapper;
+
 @Provider
-public class NotAllowedExceptionMapper extends AbstractClientExceptionMapper<NotAllowedException> {
+public class NotAllowedExceptionMapper extends AbstractExceptionMapper<NotAllowedException> {
 	@Override
-	public String getReason() {
-		return "notAllowed";
-	}
-
-	@Override
-	public String getDeveloperMessage() {
-		return "Your requesting a resource method that is not allowed.";
-	}
-
-	@Override
-	public String getErrorCode() {
-		return "CLIENT-0003";
+	protected String getReason() {
+		return "methodNotAllowed";
 	}
 }

@@ -3,20 +3,12 @@ package com.monarchapis.driver.jaxrs.v2;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ext.Provider;
 
+import com.monarchapis.driver.jaxrs.common.AbstractExceptionMapper;
+
 @Provider
-public class NotFoundExceptionMapper extends AbstractClientExceptionMapper<NotFoundException> {
+public class NotFoundExceptionMapper extends AbstractExceptionMapper<NotFoundException> {
 	@Override
-	public String getReason() {
+	protected String getReason() {
 		return "notFound";
-	}
-
-	@Override
-	public String getDeveloperMessage() {
-		return "The resource you requested was not found.";
-	}
-
-	@Override
-	public String getErrorCode() {
-		return "CLIENT-0001";
 	}
 }

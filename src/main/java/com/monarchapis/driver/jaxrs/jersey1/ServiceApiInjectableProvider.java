@@ -3,7 +3,7 @@ package com.monarchapis.driver.jaxrs.jersey1;
 import javax.ws.rs.ext.Provider;
 
 import com.monarchapis.driver.service.v1.ServiceApi;
-import com.monarchapis.driver.service.v1.ServiceContainer;
+import com.monarchapis.driver.util.ServiceResolver;
 import com.sun.jersey.api.core.HttpContext;
 
 @Provider
@@ -14,6 +14,6 @@ public class ServiceApiInjectableProvider extends AbstractInjectableProvider<Ser
 
 	@Override
 	public ServiceApi getValue(HttpContext httpContext) {
-		return ServiceContainer.getInstance().getServiceApi();
+		return ServiceResolver.getInstance().getService(ServiceApi.class);
 	}
 }

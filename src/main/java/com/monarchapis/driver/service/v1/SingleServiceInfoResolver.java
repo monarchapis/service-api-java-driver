@@ -1,6 +1,7 @@
 package com.monarchapis.driver.service.v1;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +17,14 @@ public class SingleServiceInfoResolver implements ServiceInfoResolver {
 
 	private ServiceInfo serviceInfo;
 
+	public SingleServiceInfoResolver() {
+	}
+
 	public SingleServiceInfoResolver(OpenApi openApi, String environmentName, String serviceName, String providerKey) {
-		this.openApi = openApi;
-		this.environmentName = StringUtils.trimToNull(environmentName);
-		this.serviceName = StringUtils.trimToNull(serviceName);
-		this.providerKey = StringUtils.trimToNull(providerKey);
+		setOpenApi(openApi);
+		setEnvironmentName(environmentName);
+		setServiceName(serviceName);
+		setProviderKey(providerKey);
 	}
 
 	@Override
@@ -32,5 +36,22 @@ public class SingleServiceInfoResolver implements ServiceInfoResolver {
 		}
 
 		return serviceInfo;
+	}
+
+	public void setOpenApi(OpenApi openApi) {
+		Validate.notNull(openApi, "openApi is required");
+		this.openApi = openApi;
+	}
+
+	public void setEnvironmentName(String environmentName) {
+		this.environmentName = StringUtils.trimToNull(environmentName);
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = StringUtils.trimToNull(serviceName);
+	}
+
+	public void setProviderKey(String providerKey) {
+		this.providerKey = StringUtils.trimToNull(providerKey);
 	}
 }

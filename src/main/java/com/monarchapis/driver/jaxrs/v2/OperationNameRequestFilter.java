@@ -21,4 +21,8 @@ public class OperationNameRequestFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext context) throws IOException {
 		OperationNameHolder.setCurrent(operationName);
 	}
+
+	public String getOperationName() {
+		return operationName;
+	}
 }

@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 
 @XmlRootElement(name = "error")
 public class ApiError {
-	private int code = 500;
+	private int status = 500;
 	private String reason;
 	private String message;
 	private String developerMessage;
@@ -31,7 +31,7 @@ public class ApiError {
 
 	public ApiError(int status, String reason, String message, String developerMessage, String errorCode,
 			String moreInfo, DateTime time) {
-		this.code = status;
+		this.status = status;
 		this.reason = reason;
 		this.message = message;
 		this.developerMessage = developerMessage;
@@ -40,16 +40,16 @@ public class ApiError {
 		this.time = time;
 	}
 
-	public int getCode() {
-		return code;
+	public int getStatus() {
+		return status;
 	}
 
-	public void setCode(int code) {
-		this.code = code;
+	public void setStatus(int code) {
+		this.status = code;
 	}
 
 	public ApiError code(int code) {
-		setCode(code);
+		setStatus(code);
 		return this;
 	}
 

@@ -12,9 +12,9 @@ import org.glassfish.jersey.server.model.Parameter;
 
 import com.monarchapis.driver.annotation.ApiInject;
 import com.monarchapis.driver.model.ApiContext;
-import com.monarchapis.driver.service.v1.EventsApi;
+import com.monarchapis.driver.service.v1.CommandApi;
 import com.monarchapis.driver.service.v1.ServiceApi;
-import com.monarchapis.driver.service.v1.ServiceContainer;
+import com.monarchapis.driver.util.ServiceResolver;
 
 /**
  * Class to take {@link ApiContext} object from the thread and make sure it can
@@ -57,13 +57,13 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 
 	private static final class ServiceApiValueFactory extends AbstractContainerRequestValueFactory<ServiceApi> {
 		public ServiceApi provide() {
-			return ServiceContainer.getInstance().getServiceApi();
+			return ServiceResolver.getInstance().getService(ServiceApi.class);
 		}
 	}
 
-	private static final class EventsApiValueFactory extends AbstractContainerRequestValueFactory<EventsApi> {
-		public EventsApi provide() {
-			return ServiceContainer.getInstance().getEventsApi();
+	private static final class CommandApiValueFactory extends AbstractContainerRequestValueFactory<CommandApi> {
+		public CommandApi provide() {
+			return ServiceResolver.getInstance().getService(CommandApi.class);
 		}
 	}
 
@@ -100,8 +100,8 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 				return new ApiContextValueFactory();
 			} else if (classType.equals(ServiceApi.class)) {
 				return new ServiceApiValueFactory();
-			} else if (classType.equals(EventsApi.class)) {
-				return new EventsApiValueFactory();
+			} else if (classType.equals(CommandApi.class)) {
+				return new CommandApiValueFactory();
 			}
 		}
 

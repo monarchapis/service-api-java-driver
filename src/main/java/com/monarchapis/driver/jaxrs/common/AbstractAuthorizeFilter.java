@@ -3,9 +3,8 @@ package com.monarchapis.driver.jaxrs.common;
 import java.math.BigDecimal;
 
 import com.monarchapis.driver.annotation.Claim;
-import com.monarchapis.driver.exception.ForbiddenException;
-import com.monarchapis.driver.exception.InvalidAccessTokenException;
-import com.monarchapis.driver.model.ApiContext;
+import com.monarchapis.driver.authentication.Authenticator;
+import com.monarchapis.driver.util.ServiceResolver;
 
 public abstract class AbstractAuthorizeFilter {
 	private String[] client;
@@ -24,38 +23,29 @@ public abstract class AbstractAuthorizeFilter {
 	}
 
 	protected void checkPermissions() {
-		ApiContext apiContext = JaxRsUtils.getApiContext(requestWeight);
+		ServiceResolver serviceResolver = ServiceResolver.getInstance();
+		Authenticator authenticator = serviceResolver.getService(Authenticator.class);
 
-		if (apiContext == null) {
-			throw new ForbiddenException();
-		}
+		authenticator.performAccessChecks(requestWeight, client, delegated, user, claims);
+	}
 
-		for (String permission : client) {
-			if (!apiContext.hasClientPermission(permission)) {
-				throw new ForbiddenException();
-			}
-		}
+	public String[] getClient() {
+		return client;
+	}
 
-		// Only check delegated permissions if a token is part of the API
-		// context.
-		if (delegated.length > 0 && apiContext.getToken() != null) {
-			for (String permission : delegated) {
-				if (!apiContext.hasDelegatedPermission(permission)) {
-					throw new ForbiddenException();
-				}
-			}
-		}
+	public boolean isUser() {
+		return user;
+	}
 
-		if (user || claims.length > 0) {
-			if (apiContext.getPrincipal() == null) {
-				throw new InvalidAccessTokenException();
-			}
+	public String[] getDelegated() {
+		return delegated;
+	}
 
-			for (Claim claim : claims) {
-				if (!apiContext.hasUserClaim(claim.type(), claim.value())) {
-					throw new ForbiddenException();
-				}
-			}
-		}
+	public Claim[] getClaims() {
+		return claims;
+	}
+
+	public BigDecimal getRequestWeight() {
+		return requestWeight;
 	}
 }

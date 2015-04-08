@@ -17,19 +17,18 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.monarchapis.driver.model.AuthenticationRequest;
-import com.monarchapis.driver.service.v1.ServiceContainer;
+import com.monarchapis.driver.model.AuthenticationSettings;
+import com.monarchapis.driver.util.ServiceResolver;
 
 public class ApiRequest extends HttpServletRequestWrapper {
 	private static InheritableThreadLocal<ApiRequest> current = new InheritableThreadLocal<ApiRequest>();
 
-	private HttpServletRequest request;
 	private byte[] body;
 	private Map<String, List<String>> headers;
 	private String requestId;
 
 	public ApiRequest(HttpServletRequest request) throws IOException {
 		super(request);
-		this.request = request;
 		this.body = IOUtils.toByteArray(request.getInputStream());
 		requestId = StringUtils.replace(UUID.randomUUID().toString(), "-", "");
 	}
@@ -39,10 +38,11 @@ public class ApiRequest extends HttpServletRequestWrapper {
 	}
 
 	public static void setCurrent(ApiRequest context) {
-		if (context != null)
+		if (context != null) {
 			current.set(context);
-		else
+		} else {
 			current.remove();
+		}
 	}
 
 	public static void remove() {
@@ -62,10 +62,14 @@ public class ApiRequest extends HttpServletRequestWrapper {
 	}
 
 	public String getFullURL() {
-		StringBuffer requestURL = request.getRequestURL();
-		String queryString = request.getQueryString();
+		StringBuffer requestURL = getRequestURL();
+		String queryString = getQueryString();
 
-		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+		if (queryString == null) {
+			return requestURL.toString();
+		} else {
+			return requestURL.append('?').append(queryString).toString();
+		}
 	}
 
 	public Map<String, List<String>> getHeaderMap() {
@@ -101,7 +105,7 @@ public class ApiRequest extends HttpServletRequestWrapper {
 
 	public AuthenticationRequest createAuthorizationRequest() {
 		AuthenticationRequest auth = new AuthenticationRequest();
-		ServiceContainer container = ServiceContainer.getInstance();
+		AuthenticationSettings settings = ServiceResolver.getInstance().getService(AuthenticationSettings.class);
 
 		auth.setProtocol(getProtocol());
 		auth.setMethod(getMethod());
@@ -111,8 +115,8 @@ public class ApiRequest extends HttpServletRequestWrapper {
 		auth.setQuerystring(getQueryString());
 		auth.setIpAddress(getRemoteAddr());
 		auth.setHeaders(getHeaderMap());
-		auth.setPerformAuthorization(container.isDelegateAuthorization());
-		auth.setBypassRateLimiting(container.isBypassRateLimiting());
+		auth.setPerformAuthorization(settings.isDelegateAuthorization());
+		auth.setBypassRateLimiting(settings.isBypassRateLimiting());
 
 		return auth;
 	}
@@ -122,7 +126,7 @@ public class ApiRequest extends HttpServletRequestWrapper {
 		Enumeration<String> headerNames = getHeaderNames();
 
 		size += getMethod().length() + 1; // + " "
-		size += getFullUrl().length() + 10; // + " HTTP/1.X\n"
+		size += getFullURL().length() + 10; // + " HTTP/1.X\n"
 
 		while (headerNames.hasMoreElements()) {
 			String headerName = headerNames.nextElement();
@@ -138,16 +142,5 @@ public class ApiRequest extends HttpServletRequestWrapper {
 		size += body.length + 1; // + \n for blank line
 
 		return size;
-	}
-
-	public String getFullUrl() {
-		StringBuffer requestURL = getRequestURL();
-		String queryString = getQueryString();
-
-		if (queryString == null) {
-			return requestURL.toString();
-		} else {
-			return requestURL.append('?').append(queryString).toString();
-		}
 	}
 }

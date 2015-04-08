@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpResponse;
-import com.monarchapis.driver.authentication.AuthenticationSigner;
-import com.monarchapis.driver.authentication.ProviderCredentials;
 import com.monarchapis.driver.model.AuthenticationRequest;
 import com.monarchapis.driver.model.AuthenticationResponse;
 import com.monarchapis.driver.model.AuthorizationDetails;
@@ -20,19 +18,9 @@ import com.monarchapis.driver.model.Message;
 import com.monarchapis.driver.model.Token;
 import com.monarchapis.driver.model.TokenRequest;
 import com.monarchapis.driver.service.v1.ServiceApi;
-import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 
 public class ServiceApiDriver extends AbstractEnvironmentDriver implements ServiceApi {
 	private static final Logger logger = LoggerFactory.getLogger(ServiceApiDriver.class);
-
-	public ServiceApiDriver(String url, ProviderCredentials providerCredentials, ServiceInfoResolver serviceInfoResolver) {
-		super(url, providerCredentials, serviceInfoResolver);
-	}
-
-	public ServiceApiDriver(String url, ProviderCredentials providerCredentials,
-			ServiceInfoResolver serviceInfoResolver, AuthenticationSigner authenticationSigner) {
-		super(url, providerCredentials, serviceInfoResolver, authenticationSigner);
-	}
 
 	@Override
 	public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {

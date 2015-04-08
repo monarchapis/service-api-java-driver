@@ -6,23 +6,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.monarchapis.driver.authentication.AuthenticationSigner;
-import com.monarchapis.driver.authentication.ProviderCredentials;
 import com.monarchapis.driver.service.v1.AnalyticsApi;
-import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 
 public class AnalyticsApiDriver extends AbstractEnvironmentDriver implements AnalyticsApi {
 	private static final Logger logger = LoggerFactory.getLogger(AnalyticsApiDriver.class);
-
-	public AnalyticsApiDriver(String url, ProviderCredentials providerCredentials,
-			ServiceInfoResolver serviceInfoResolver) {
-		super(url, providerCredentials, serviceInfoResolver);
-	}
-
-	public AnalyticsApiDriver(String url, ProviderCredentials providerCredentials,
-			ServiceInfoResolver serviceInfoResolver, AuthenticationSigner authenticationSigner) {
-		super(url, providerCredentials, serviceInfoResolver, authenticationSigner);
-	}
 
 	@Override
 	public void event(String eventType, ObjectNode data) {

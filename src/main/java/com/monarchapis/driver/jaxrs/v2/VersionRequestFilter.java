@@ -21,4 +21,8 @@ public class VersionRequestFilter implements ContainerRequestFilter {
 	public void filter(ContainerRequestContext context) throws IOException {
 		VersionHolder.setCurrent(version);
 	}
+
+	public String getVersion() {
+		return version;
+	}
 }

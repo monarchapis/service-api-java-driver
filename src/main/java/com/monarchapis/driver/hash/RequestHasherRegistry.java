@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.Lists;
 import com.monarchapis.driver.exception.ApiException;
 
 public class RequestHasherRegistry {
@@ -20,6 +21,10 @@ public class RequestHasherRegistry {
 
 	public RequestHasherRegistry(List<RequestHasher> hashers) {
 		setRequestHashers(hashers);
+	}
+
+	public RequestHasherRegistry(RequestHasher... hashers) {
+		setRequestHashers(Lists.newArrayList(hashers));
 	}
 
 	@Inject

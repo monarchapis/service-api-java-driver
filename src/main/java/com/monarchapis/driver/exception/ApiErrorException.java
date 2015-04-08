@@ -1,13 +1,30 @@
 package com.monarchapis.driver.exception;
 
-import org.joda.time.DateTime;
-
 import com.monarchapis.driver.model.ErrorHolder;
+import com.monarchapis.driver.util.ServiceResolver;
 
 public class ApiErrorException extends ApiException {
 	private static final long serialVersionUID = -6106308203401428275L;
 
 	private ApiError error;
+
+	public ApiErrorException(String reason) {
+		this(reason, null);
+	}
+
+	public ApiErrorException(String reason, Throwable t) {
+		this(ServiceResolver.getInstance().getService(ApiErrorFactory.class) //
+				.error(reason), null);
+	}
+
+	public ApiErrorException(String reason, String template, String... args) {
+		this(reason, (Throwable) null, template, args);
+	}
+
+	public ApiErrorException(String reason, Throwable t, String template, String... args) {
+		this(ServiceResolver.getInstance().getService(ApiErrorFactory.class) //
+				.error(reason, template, (Object[]) args), t);
+	}
 
 	public ApiErrorException(ApiError error) {
 		this(error, null);
@@ -33,29 +50,5 @@ public class ApiErrorException extends ApiException {
 
 	public ApiError getError() {
 		return error;
-	}
-
-	public int getCode() {
-		return error.getCode();
-	}
-
-	public String getReason() {
-		return error.getReason();
-	}
-
-	public String getDeveloperMessage() {
-		return error.getDeveloperMessage();
-	}
-
-	public DateTime getTime() {
-		return error.getTime();
-	}
-
-	public String getErrorCode() {
-		return error.getErrorCode();
-	}
-
-	public String getMoreInfo() {
-		return error.getMoreInfo();
 	}
 }

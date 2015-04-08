@@ -1,0 +1,7 @@
+{
+	"basePath" : "${apiBasePath}",
+	"oauthPasswordUrl" : "${oauthPasswordUrl}",
+	"oauthImplicitUrl" : "${oauthImplicitUrl}",
+	"oauthAuthorizationCodeRequestUrl" : "${oauthAuthorizationCodeRequestUrl}",
+	"oauthAuthorizationCodeTokenUrl" : "${oauthAuthorizationCodeTokenUrl}"
+}

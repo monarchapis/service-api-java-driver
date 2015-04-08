@@ -1,0 +1,170 @@
+notFound:
+    default:
+        status:              404
+        errorCode:           CLIENT-001
+        message:             "Sorry. The record you requested was not found."
+        developerMessage:    "The resource you requested was not found."
+    1:
+        message:             "Sorry. The {0} you requested was not found."
+    collection:
+        message:             "Sorry. The {0} you requested was not found."
+    2:
+        message:             "Sorry. The {0} with ID {1} was not found."
+    entity:
+        message:             "Sorry. The {0} with ID {1} was not found."
+
+missingParameter:
+    default:
+        status:              400
+        errorCode:           CLIENT-002
+        message:             "Your request did not provide a required paramater."
+        developerMessage:    "Your request did not provide a required paramater."
+    1:
+        message:             "{0} is a required paramater."
+        developerMessage:    "{0} is a required paramater."
+    param:
+        message:             "{0} is a required paramater."
+        developerMessage:    "{0} is a required paramater."
+
+invalidParameter:
+    default:
+        status:              400
+        errorCode:           CLIENT-003
+        message:             "Your request contained an invalid paramater."
+        developerMessage:    "Your request contained an invalid paramater."
+    1:
+        message:             "The provided value for {0} is invalid."
+        developerMessage:    "The provided value for {0} is invalid."
+
+methodNotAllowed:
+    default:
+        status:              405
+        errorCode:           CLIENT-004
+        message:             The operation you performed is not allowed.
+        developerMessage:    You are requesting a resource method that is not allowed.
+
+mediaTypeNotSupported:
+    default:
+        status:              415
+        errorCode:           CLIENT-005
+        message:             message
+        developerMessage:    message
+
+mediaTypeNotAcceptable:
+    default:
+        status:              406
+        errorCode:           CLIENT-006
+        message:             message
+        developerMessage:    message
+
+badRequest:
+    default:
+        status:              400
+        errorCode:           CLIENT-007
+        message:             message
+        developerMessage:    message
+
+typeMismatch:
+    default:
+        status:              400
+        errorCode:           CLIENT-008
+        message:             message
+        developerMessage:    message
+
+messageNotReadable:
+    default:
+        status:              400
+        errorCode:           CLIENT-009
+        message:             message
+        developerMessage:    message
+
+missingRequestPart:
+    default:
+        status:              400
+        errorCode:           CLIENT-010
+        message:             message
+        developerMessage:    message
+
+bindingException:
+    default:
+        status:              400
+        errorCode:           CLIENT-011
+        message:             message
+        developerMessage:    message
+
+forbidden:
+    default:
+        status:              403
+        errorCode:           SECURITY-001
+        message:             "Access denied"
+        developerMessage:    "Your client is not authorized to make this request."
+
+invalidCredentials:
+    default:
+        status:              401
+        errorCode:           SECURITY-002
+        message:             "Access denied"
+        developerMessage:    "Your request did not contain a valid access token."
+
+invalidAccessToken:
+    default:
+        status:              401
+        errorCode:           SECURITY-003
+        message:             "Access denied"
+        developerMessage:    "Your request did not contain a valid access token."
+
+notAuthorized:
+    default:
+        status:              401
+        errorCode:           SECURITY-004
+        message:             "Access denied"
+        developerMessage:    "Your client or access token does not has insufficient permissions."
+
+insufficientPermissions:
+    default:
+        status:              401
+        errorCode:           SECURITY-004
+        message:             "Access denied"
+        developerMessage:    "Your client or access token does not has insufficient permissions."
+
+invalidAccessToken:
+    default:
+        status:              401
+        errorCode:           SECURITY-005
+        message:             "Access denied."
+        developerMessage:    "Your request did not contain a valid access token."
+
+conflict:
+    default:
+        status:              409
+        errorCode:           CLIENT-012
+        message:             "Conflict"
+        developerMessage:    "There was a conflict encountered in processing your request."
+
+internalError:
+    default:
+        status:              500
+        errorCode:           SERVER-001
+        message:             message
+        developerMessage:    message
+
+serviceUnavailable:
+    default:
+        status:              500
+        errorCode:           SERVER-002
+        message:             message
+        developerMessage:    message
+
+conversionNotSupported:
+    default:
+        status:              500
+        errorCode:           SERVER-003
+        message:             message
+        developerMessage:    message
+
+messageNotWritable:
+    default:
+        status:              500
+        errorCode:           SERVER-004
+        message:             message
+        developerMessage:    message
