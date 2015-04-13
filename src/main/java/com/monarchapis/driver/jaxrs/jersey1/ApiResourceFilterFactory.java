@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.jaxrs.jersey1;
 
 import java.lang.annotation.Annotation;
@@ -16,6 +33,11 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 
+/**
+ * Applies various resource filters to methods of resource classes.
+ * 
+ * @author Phil Kedy
+ */
 public class ApiResourceFilterFactory implements ResourceFilterFactory {
 	@Override
 	public List<ResourceFilter> create(AbstractMethod am) {
@@ -52,6 +74,15 @@ public class ApiResourceFilterFactory implements ResourceFilterFactory {
 		return filters;
 	}
 
+	/**
+	 * Find an annotation first at the method level then at the class level.
+	 * 
+	 * @param am
+	 *            The method
+	 * @param clazz
+	 *            The annotation class to find
+	 * @return the annotation if found, null otherwise.
+	 */
 	private <T extends Annotation> T getAnnotation(AbstractMethod am, Class<T> clazz) {
 		T annotation = null;
 

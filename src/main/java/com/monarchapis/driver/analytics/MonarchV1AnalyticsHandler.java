@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.analytics;
 
 import java.io.UnsupportedEncodingException;
@@ -5,7 +22,6 @@ import java.net.URLDecoder;
 import java.util.Enumeration;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +40,11 @@ import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 import com.monarchapis.driver.servlet.ApiRequest;
 import com.monarchapis.driver.servlet.ApiResponse;
 
+/**
+ * Handles collecting analytics events into a data store.
+ * 
+ * @author Phil Kedy
+ */
 public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MonarchV1AnalyticsHandler.class);
 
@@ -87,7 +108,14 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 		analyticsApi.event("traffic", event);
 	}
 
-	private ObjectNode getParameters(HttpServletRequest request) {
+	/**
+	 * Converts the request query string into an object node.
+	 * 
+	 * @param request
+	 *            The API request
+	 * @return the object node if a query string exists, null otherwise.
+	 */
+	private ObjectNode getParameters(ApiRequest request) {
 		ObjectNode params = null;
 		String qs = request.getQueryString();
 
@@ -109,7 +137,14 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 		return params;
 	}
 
-	private ObjectNode getHeaders(HttpServletRequest request) {
+	/**
+	 * Converts the request headers into an object node.
+	 * 
+	 * @param request
+	 *            The API request
+	 * @return the object node with all of the headers as key-value pairs.
+	 */
+	private ObjectNode getHeaders(ApiRequest request) {
 		ObjectNode params = objectMapper.createObjectNode();
 		Enumeration<String> headerNames = request.getHeaderNames();
 
@@ -123,10 +158,22 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 		return params;
 	}
 
+	/**
+	 * Sets the Analytics API
+	 * 
+	 * @param analyticsApi
+	 *            The Analytics API implementation
+	 */
 	public void setAnalyticsApi(AnalyticsApi analyticsApi) {
 		this.analyticsApi = analyticsApi;
 	}
 
+	/**
+	 * Sets the service info resolver
+	 * 
+	 * @param serviceInfoResolver
+	 *            The service info resolver
+	 */
 	public void setServiceInfoResolver(ServiceInfoResolver serviceInfoResolver) {
 		this.serviceInfoResolver = serviceInfoResolver;
 	}

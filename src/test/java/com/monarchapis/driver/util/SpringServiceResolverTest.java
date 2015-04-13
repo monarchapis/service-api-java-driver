@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.util;
 
 import static org.junit.Assert.*;
@@ -49,17 +66,17 @@ public class SpringServiceResolverTest {
 
 	@Test
 	public void testBeanFound() {
-		assertEquals("test", resolver.getService(String.class));
+		assertEquals("test", resolver.required(String.class));
 	}
 
 	@Test(expected = NoSuchBeanDefinitionException.class)
 	public void testBeanNotFound() {
-		resolver.getService(Boolean.class);
+		resolver.required(Boolean.class);
 	}
 
 	@Test
 	public void testOptionalBeanFound() {
-		Optional<String> actual = resolver.getOptional(String.class);
+		Optional<String> actual = resolver.optional(String.class);
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
 		assertEquals("test", actual.get());
@@ -67,7 +84,7 @@ public class SpringServiceResolverTest {
 
 	@Test
 	public void testOptionalBeanNotFound() {
-		Optional<Boolean> actual = resolver.getOptional(Boolean.class);
+		Optional<Boolean> actual = resolver.optional(Boolean.class);
 		assertNotNull(actual);
 		assertFalse(actual.isPresent());
 	}

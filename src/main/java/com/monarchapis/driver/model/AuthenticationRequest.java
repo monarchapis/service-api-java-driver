@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.model;
 
 import java.math.BigDecimal;
@@ -8,18 +25,72 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+/**
+ * Represents an authentication request for the API request.
+ * 
+ * @author Phil Kedy
+ */
 public class AuthenticationRequest {
+	/**
+	 * The HTTP method.
+	 */
 	private String method;
+
+	/**
+	 * The protocol (e.g. http or https).
+	 */
 	private String protocol;
+
+	/**
+	 * The API server host.
+	 */
 	private String host;
+
+	/**
+	 * The API server port.
+	 */
 	private int port;
+
+	/**
+	 * The request path.
+	 */
 	private String path;
+
+	/**
+	 * The request query string.
+	 */
 	private String querystring;
+
+	/**
+	 * The request headers.
+	 */
 	private Map<String, List<String>> headers;
+
+	/**
+	 * The request remote IP address.
+	 */
 	private String ipAddress;
+
+	/**
+	 * The payload hashes calculated by the service.
+	 */
 	private Map<String, Map<String, String>> payloadHashes;
+
+	/**
+	 * The request weight used for rate limit counting.
+	 */
 	private BigDecimal requestWeight;
+
+	/**
+	 * Flag that instructs Monarch to perform authorization based on the
+	 * configured operations of the service.
+	 */
 	private boolean performAuthorization;
+
+	/**
+	 * Flag that instructs Monarch to bypass rate limiting. This should be
+	 * enabled when using the API Gateway.
+	 */
 	private boolean bypassRateLimiting;
 
 	public String getMethod() {

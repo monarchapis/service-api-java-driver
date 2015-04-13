@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.util;
 
 import java.util.Collection;
@@ -41,8 +58,11 @@ public final class MIMEParse {
 		@Override
 		public String toString() {
 			StringBuffer s = new StringBuffer("('" + type + "', '" + subType + "', {");
-			for (String k : params.keySet())
+
+			for (String k : params.keySet()) {
 				s.append("'" + k + "':'" + params.get(k) + "',");
+			}
+
 			return s.append("})").toString();
 		}
 	}
@@ -54,6 +74,9 @@ public final class MIMEParse {
 	 * into:
 	 * 
 	 * ('application', 'xhtml', {'q', '0.5'})
+	 * 
+	 * @param mimeType
+	 *            The mime type
 	 */
 	protected static ParseResults parseMimeType(String mimeType) {
 		String[] parts = StringUtils.split(mimeType, ";");
@@ -63,18 +86,24 @@ public final class MIMEParse {
 		for (int i = 1; i < parts.length; ++i) {
 			String p = parts[i];
 			String[] subParts = StringUtils.split(p, '=');
-			if (subParts.length == 2)
+
+			if (subParts.length == 2) {
 				results.params.put(subParts[0].trim(), subParts[1].trim());
+			}
 		}
+
 		String fullType = parts[0].trim();
 
 		// Java URLConnection class sends an Accept header that includes a
 		// single "*" - Turn it into a legal wildcard.
-		if (fullType.equals("*"))
+		if (fullType.equals("*")) {
 			fullType = "*/*";
+		}
+
 		String[] types = StringUtils.split(fullType, "/");
 		results.type = types[0].trim();
 		results.subType = types[1].trim();
+
 		return results;
 	}
 
@@ -90,13 +119,17 @@ public final class MIMEParse {
 	 * necessary.
 	 * 
 	 * @param range
+	 *            The media range
 	 */
 	protected static ParseResults parseMediaRange(String range) {
 		ParseResults results = parseMimeType(range);
 		String q = results.params.get("q");
 		float f = NumberUtils.toFloat(q, 1);
-		if (StringUtils.isBlank(q) || f < 0 || f > 1)
+
+		if (StringUtils.isBlank(q) || f < 0 || f > 1) {
 			results.params.put("q", "1");
+		}
+
 		return results;
 	}
 
@@ -117,12 +150,14 @@ public final class MIMEParse {
 
 		public int compareTo(FitnessAndQuality o) {
 			if (fitness == o.fitness) {
-				if (quality == o.quality)
+				if (quality == o.quality) {
 					return 0;
-				else
+				} else {
 					return quality < o.quality ? -1 : 1;
-			} else
+				}
+			} else {
 				return fitness < o.fitness ? -1 : 1;
+			}
 		}
 	}
 
@@ -134,7 +169,9 @@ public final class MIMEParse {
 	 * quality_parsed(), 'parsed_ranges' must be a list of parsed media ranges.
 	 * 
 	 * @param mimeType
+	 *            The mime type
 	 * @param parsedRanges
+	 *            The parsed ranges
 	 */
 	protected static FitnessAndQuality fitnessAndQualityParsed(String mimeType, Collection<ParseResults> parsedRanges) {
 		int bestFitness = -1;
@@ -146,13 +183,16 @@ public final class MIMEParse {
 					&& (target.subType.equals(range.subType) || range.subType.equals("*") || target.subType.equals("*"))) {
 				for (String k : target.params.keySet()) {
 					int paramMatches = 0;
+
 					if (!k.equals("q") && range.params.containsKey(k)
 							&& target.params.get(k).equals(range.params.get(k))) {
 						paramMatches++;
 					}
+
 					int fitness = (range.type.equals(target.type)) ? 100 : 0;
 					fitness += (range.subType.equals(target.subType)) ? 10 : 0;
 					fitness += paramMatches;
+
 					if (fitness > bestFitness) {
 						bestFitness = fitness;
 						bestFitQ = NumberUtils.toFloat(range.params.get("q"), 0);
@@ -160,6 +200,7 @@ public final class MIMEParse {
 				}
 			}
 		}
+
 		return new FitnessAndQuality(bestFitness, bestFitQ);
 	}
 
@@ -171,8 +212,10 @@ public final class MIMEParse {
 	 * of parsed media ranges.
 	 * 
 	 * @param mimeType
+	 *            The mime type
 	 * @param parsedRanges
-	 * @return
+	 *            The parsed ranges
+	 * @return the quality parameter of the best match.
 	 */
 	protected static float qualityParsed(String mimeType, Collection<ParseResults> parsedRanges) {
 		return fitnessAndQualityParsed(mimeType, parsedRanges).quality;
@@ -183,12 +226,17 @@ public final class MIMEParse {
 	 * mediaRanges in ranges. For example:
 	 * 
 	 * @param mimeType
-	 * @param parsedRanges
+	 *            The mime type
+	 * @param ranges
+	 *            The parsed ranges
 	 */
 	public static float quality(String mimeType, String ranges) {
 		List<ParseResults> results = new LinkedList<ParseResults>();
-		for (String r : StringUtils.split(ranges, ','))
+
+		for (String r : StringUtils.split(ranges, ',')) {
 			results.add(parseMediaRange(r));
+		}
+
 		return qualityParsed(mimeType, results);
 	}
 
@@ -202,23 +250,28 @@ public final class MIMEParse {
 	 * "text/xml"}), "text/*;q=0.5,*; q=0.1") 'text/xml'
 	 * 
 	 * @param supported
+	 *            The supported list of mime types
 	 * @param header
-	 * @return
+	 *            The HTTP accept header
+	 * @return the best matching mime type.
 	 */
 	public static String bestMatch(Collection<String> supported, String header) {
 		List<ParseResults> parseResults = new LinkedList<ParseResults>();
 		List<FitnessAndQuality> weightedMatches = new LinkedList<FitnessAndQuality>();
-		for (String r : StringUtils.split(header, ','))
+
+		for (String r : StringUtils.split(header, ',')) {
 			parseResults.add(parseMediaRange(r));
+		}
 
 		for (String s : supported) {
 			FitnessAndQuality fitnessAndQuality = fitnessAndQualityParsed(s, parseResults);
 			fitnessAndQuality.mimeType = s;
 			weightedMatches.add(fitnessAndQuality);
 		}
-		Collections.sort(weightedMatches);
 
+		Collections.sort(weightedMatches);
 		FitnessAndQuality lastOne = weightedMatches.get(weightedMatches.size() - 1);
+
 		return lastOne.quality != 0 ? lastOne.mimeType : "";
 	}
 

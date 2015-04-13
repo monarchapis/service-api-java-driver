@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.exception;
 
 import java.text.MessageFormat;
@@ -15,12 +32,24 @@ import org.slf4j.LoggerFactory;
 import com.monarchapis.driver.configuration.ConfigurationBundle;
 import com.monarchapis.driver.servlet.ApiRequest;
 
+/**
+ * An implementation of an API error factory using a configuration bundle as the
+ * source for the API error details.
+ * 
+ * @author Phil Kedy
+ */
 public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationBundleApiErrorFactory.class);
 
+	/**
+	 * The configuration bundle.
+	 */
 	@Inject
 	private ConfigurationBundle configurationBundle;
 
+	/**
+	 * The moreInfo URL format.
+	 */
 	private String moreInfoFormat = null;
 
 	public ConfigurationBundle getConfigurationBundle() {
@@ -94,6 +123,25 @@ public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 		}
 	}
 
+	/**
+	 * Searches for the value of a property using the errorReason, template, and
+	 * variants as components of the property path. First, the template name is
+	 * used as the second part of the path. If that does not yield a value, then
+	 * the length of arguments is used. Finally, "default" is used in the path.
+	 * 
+	 * @param errorReason
+	 *            The error reason
+	 * @param property
+	 *            The error property to find
+	 * @param template
+	 *            The preferred template
+	 * @param variants
+	 *            The variants to pass on to the bundle
+	 * @param args
+	 *            The arguments for formatting the returned value
+	 * @return the string value if found, or an IllegalArgumentException is
+	 *         thrown
+	 */
 	private String getVariantString(String errorReason, String property, String template, String[] variants,
 			Object... args) {
 		String message = null;
@@ -120,6 +168,22 @@ public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 		return message;
 	}
 
+	/**
+	 * 
+	 * @param errorReason
+	 *            The error reason
+	 * @param property
+	 *            The error property to find
+	 * @param template
+	 *            The preferred template
+	 * @param variants
+	 *            The variants to pass on to the bundle
+	 * @param args
+	 *            The arguments for attempting to find the value based on the
+	 *            number of arguments
+	 * @return the integer value if found, or an IllegalArgumentException is
+	 *         thrown
+	 */
 	private Integer getVariantInteger(String errorReason, String property, String template, String[] variants,
 			Object... args) {
 		Integer value = null;
@@ -144,6 +208,13 @@ public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 		return value;
 	}
 
+	/**
+	 * Returns the array of strings based on the request locales.
+	 * 
+	 * @param request
+	 *            The API request
+	 * @return the array of variant strings
+	 */
 	private static String[] getLocaleArray(ApiRequest request) {
 		Enumeration<Locale> locales = request.getLocales();
 		ArrayList<String> localeList = new ArrayList<String>(5);
@@ -162,8 +233,6 @@ public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 			}
 		}
 
-		String[] localArray = localeList.toArray(new String[localeList.size()]);
-
-		return localArray;
+		return localeList.toArray(new String[localeList.size()]);
 	}
 }

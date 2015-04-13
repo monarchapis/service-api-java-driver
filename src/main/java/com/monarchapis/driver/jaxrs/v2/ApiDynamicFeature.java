@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.jaxrs.v2;
 
 import java.lang.annotation.Annotation;
@@ -17,6 +34,11 @@ import com.monarchapis.driver.annotation.BypassAnalytics;
 import com.monarchapis.driver.annotation.RequestWeight;
 import com.monarchapis.driver.authentication.Authenticator;
 
+/**
+ * Applies various request filters to methods of resource classes.
+ * 
+ * @author Phil Kedy
+ */
 @Provider
 @PreMatching
 public class ApiDynamicFeature implements DynamicFeature {
@@ -52,6 +74,15 @@ public class ApiDynamicFeature implements DynamicFeature {
 		}
 	}
 
+	/**
+	 * Find an annotation first at the method level then at the class level.
+	 * 
+	 * @param method
+	 *            The method
+	 * @param clazz
+	 *            The annotation class to find
+	 * @return the annotation if found, null otherwise.
+	 */
 	private static <T extends Annotation> T getAnnotation(Method method, Class<T> clazz) {
 		T annotation = method.getAnnotation(clazz);
 

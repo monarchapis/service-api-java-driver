@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.jaxrs.common;
 
 import static org.junit.Assert.*;
@@ -38,7 +55,7 @@ public class SwaggerDocumentationResourceTest {
 	@Mock
 	private UriInfo uriInfo;
 
-	private SwaggerDocumentationResource resource;
+	private Swagger12DocumentationResource resource;
 
 	@Before
 	public void setup() throws URISyntaxException {
@@ -48,8 +65,8 @@ public class SwaggerDocumentationResourceTest {
 		endpoints.setImplicitUrl("implicitUrl");
 		endpoints.setPasswordUrl("passwordUrl");
 		ServiceResolver.setInstance(serviceResolver);
-		when(serviceResolver.getService(OAuthEndpoints.class)).thenReturn(endpoints);
-		when(serviceResolver.getService(ApiErrorFactory.class)).thenReturn(apiErrorFactory);
+		when(serviceResolver.required(OAuthEndpoints.class)).thenReturn(endpoints);
+		when(serviceResolver.required(ApiErrorFactory.class)).thenReturn(apiErrorFactory);
 
 		ApiError error = new ApiError(500, "message", "developerMesage", "errorCode", "moreInfo");
 		when(apiErrorFactory.error(anyString())).thenReturn(error);
@@ -57,7 +74,7 @@ public class SwaggerDocumentationResourceTest {
 
 		when(uriInfo.getBaseUri()).thenReturn(new URI("http://api.company.com/test"));
 
-		resource = new SwaggerDocumentationResource();
+		resource = new Swagger12DocumentationResource();
 	}
 
 	@After

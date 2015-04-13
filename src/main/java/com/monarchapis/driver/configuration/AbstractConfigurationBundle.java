@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.configuration;
 
 import java.io.IOException;
@@ -9,11 +26,26 @@ import java.util.Map;
 import com.google.common.base.Optional;
 import com.monarchapis.driver.exception.ApiException;
 
+/**
+ * Provides general functionality for returning configuration properties from
+ * configuration bundles.
+ * 
+ * @author Phil Kedy
+ */
 public abstract class AbstractConfigurationBundle implements ConfigurationBundle {
+	/**
+	 * A value used to cache variants that could not be found.
+	 */
 	private static final Configuration[] EMPTY_CONFIGURATIONS = new Configuration[0];
 
+	/**
+	 * The supported file extensions.
+	 */
 	protected static final String[] EXTENSIONS = new String[] { "yaml", "json" };
 
+	/**
+	 * The extension to configuration implementation map.
+	 */
 	protected static final Map<String, Class<? extends LoadableConfiguration>> EXTENSIONS_MAP;
 
 	static {
@@ -24,16 +56,27 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		EXTENSIONS_MAP = Collections.unmodifiableMap(map);
 	}
 
+	/**
+	 * The cached variants.
+	 */
 	private Map<String, Configuration[]> cachedVariants = new HashMap<String, Configuration[]>();
 
+	/**
+	 * Instantiates a new loadable configuration object based on the extension.
+	 * 
+	 * @param extension
+	 *            The configuration file extension
+	 * @return the loadable configuration object.
+	 */
 	protected LoadableConfiguration newConfiguration(String extension) {
 		try {
-			return EXTENSIONS_MAP.get(extension).newInstance();
+			return EXTENSIONS_MAP.get(extension.toLowerCase()).newInstance();
 		} catch (Exception e) {
 			throw new ApiException("Could not find configuration class for extension " + extension);
 		}
 	}
 
+	@Override
 	public Optional<String> getString(String path, String[] variants, Object... args) {
 		for (String variant : variants) {
 			Optional<String> value = getVariantString(path, variant, args);
@@ -46,6 +89,18 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return getVariantString(path, "", args);
 	}
 
+	/**
+	 * Returns a string property for a single variant.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variant
+	 *            The variant name
+	 * @param args
+	 *            The optional list of arguments for message formatting
+	 * @return a present string of the property was found, an absent string
+	 *         otherwise.
+	 */
 	protected Optional<String> getVariantString(String path, String variant, Object... args) {
 		Configuration configs[] = getConfigurationsForVariant(variant);
 
@@ -62,6 +117,7 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return Optional.absent();
 	}
 
+	@Override
 	public Optional<Integer> getInteger(String path, String[] variants) {
 		for (String variant : variants) {
 			Optional<Integer> value = getVariantInteger(path, variant);
@@ -74,6 +130,15 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return getVariantInteger(path, "");
 	}
 
+	/**
+	 * Returns an integer property for a single variant.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variant
+	 *            The variant name
+	 * @return a present integer if found, an absent integer otherwise.
+	 */
 	protected Optional<Integer> getVariantInteger(String path, String variant) {
 		Configuration configs[] = getConfigurationsForVariant(variant);
 
@@ -90,6 +155,7 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return Optional.absent();
 	}
 
+	@Override
 	public Optional<Long> getLong(String path, String[] variants) {
 		for (String variant : variants) {
 			Optional<Long> value = getVariantLong(path, variant);
@@ -102,6 +168,15 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return getVariantLong(path, "");
 	}
 
+	/**
+	 * Returns a long property for a single variant.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variant
+	 *            The variant name
+	 * @return a present long if found, an absent long otherwise.
+	 */
 	protected Optional<Long> getVariantLong(String path, String variant) {
 		Configuration configs[] = getConfigurationsForVariant(variant);
 
@@ -118,6 +193,7 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return Optional.absent();
 	}
 
+	@Override
 	public Optional<Boolean> getBoolean(String path, String[] variants) {
 		for (String variant : variants) {
 			Optional<Boolean> value = getVariantBoolean(path, variant);
@@ -130,6 +206,15 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return getVariantBoolean(path, "");
 	}
 
+	/**
+	 * Returns a boolean property for a single variant.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variant
+	 *            The variant name
+	 * @return a present boolean if found, an absent boolean otherwise.
+	 */
 	protected Optional<Boolean> getVariantBoolean(String path, String variant) {
 		Configuration configs[] = getConfigurationsForVariant(variant);
 
@@ -146,6 +231,7 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return Optional.absent();
 	}
 
+	@Override
 	public Optional<Double> getDouble(String path, String[] variants) {
 		for (String variant : variants) {
 			Optional<Double> value = getVariantDouble(path, variant);
@@ -158,6 +244,15 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return getVariantDouble(path, "");
 	}
 
+	/**
+	 * Returns a double property for a single variant.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variant
+	 *            The variant name
+	 * @return a present double if found, an absent double otherwise.
+	 */
 	protected Optional<Double> getVariantDouble(String path, String variant) {
 		Configuration configs[] = getConfigurationsForVariant(variant);
 
@@ -174,6 +269,16 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return Optional.absent();
 	}
 
+	/**
+	 * Attempts to retrieve the configurations for a variant from cache. If not
+	 * found in cache, it will attempt to load it. If the configuration is not
+	 * found, empty configurations are added to the cache to prevent future
+	 * cycles.
+	 * 
+	 * @param variant
+	 *            The variant name
+	 * @return the array of configurations for the variant.
+	 */
 	private Configuration[] getConfigurationsForVariant(String variant) {
 		Configuration[] configs = cachedVariants.get(variant);
 
@@ -194,5 +299,14 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 		return configs;
 	}
 
+	/**
+	 * Loads configurations for a given variant.
+	 * 
+	 * @param variant
+	 *            The variant name.
+	 * @return the array of configurations for the given variant.
+	 * @throws IOException
+	 *             when there was a problem reading a configuration file.
+	 */
 	protected abstract Configuration[] loadConfigurationsVariant(String variant) throws IOException;
 }

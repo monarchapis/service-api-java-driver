@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.authentication;
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +32,15 @@ import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 
+/**
+ * Uses the Hawk authentication protocol to sign an API request.
+ * 
+ * @author Phil Kedy
+ */
 public class HawkV1AuthenticationSigner implements AuthenticationSigner {
+	/**
+	 * Flag that denotes that request payload verification is enabled.
+	 */
 	private boolean requestPayloadVerification;
 
 	public HawkV1AuthenticationSigner() {
@@ -26,6 +51,10 @@ public class HawkV1AuthenticationSigner implements AuthenticationSigner {
 		setRequestPayloadVerification(requestPayloadVerification);
 	}
 
+	/**
+	 * Calculates the payload hash (if enabled), creates the Hawk header, and
+	 * sets the Authorization header.
+	 */
 	@Override
 	public void signRequest(HttpRequest request, String algorithm, String apiKey, String sharedSecret,
 			String accessToken) {
@@ -35,6 +64,13 @@ public class HawkV1AuthenticationSigner implements AuthenticationSigner {
 		headers.setAuthorization(header);
 	}
 
+	/**
+	 * Creates the Hawk request hash.
+	 * 
+	 * @param request
+	 *            The API request
+	 * @return a Base64 string representing the hash.
+	 */
 	public String createHawkHash(HttpRequest request) {
 		try {
 			StringBuilder sb = new StringBuilder();
@@ -63,6 +99,25 @@ public class HawkV1AuthenticationSigner implements AuthenticationSigner {
 		}
 	}
 
+	/**
+	 * Creates the hawk header
+	 * 
+	 * @param request
+	 *            The API request
+	 * @param algorithm
+	 *            The HMac algorithm to use
+	 * @param apiKey
+	 *            The client/provider API key
+	 * @param sharedSecret
+	 *            The client/provider shared secret
+	 * @param accessToken
+	 *            The optional access token
+	 * @param payloadHash
+	 *            The request payload hash
+	 * @param extData
+	 *            The optional extended data
+	 * @return a string representing Authorization header for Hawk.
+	 */
 	public String createHawkHeader(HttpRequest request, String algorithm, String apiKey, String sharedSecret,
 			String accessToken, String payloadHash, String extData) {
 		try {
@@ -138,10 +193,20 @@ public class HawkV1AuthenticationSigner implements AuthenticationSigner {
 		}
 	}
 
+	/**
+	 * Returns a random nonce.
+	 * 
+	 * @return a random nonce.
+	 */
 	protected String getNonce() {
 		return RandomStringUtils.randomAlphanumeric(6);
 	}
 
+	/**
+	 * Returns the current time stamp in seconds.
+	 * 
+	 * @return the current time stamp
+	 */
 	protected long getTimestamp() {
 		return System.currentTimeMillis() / 1000;
 	}

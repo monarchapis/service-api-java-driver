@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.jaxrs.jersey2;
 
 import javax.inject.Inject;
@@ -17,8 +34,10 @@ import com.monarchapis.driver.service.v1.ServiceApi;
 import com.monarchapis.driver.util.ServiceResolver;
 
 /**
- * Class to take {@link ApiContext} object from the thread and make sure it can
- * be automatically injected in resources.
+ * Class to automatically inject {@link ApiContext}, {@link ServiceApi}, and
+ * {@link CommandApi} into resources.
+ * 
+ * @author Phil Kedy
  */
 @Singleton
 final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
@@ -57,13 +76,13 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 
 	private static final class ServiceApiValueFactory extends AbstractContainerRequestValueFactory<ServiceApi> {
 		public ServiceApi provide() {
-			return ServiceResolver.getInstance().getService(ServiceApi.class);
+			return ServiceResolver.getInstance().required(ServiceApi.class);
 		}
 	}
 
 	private static final class CommandApiValueFactory extends AbstractContainerRequestValueFactory<CommandApi> {
 		public CommandApi provide() {
-			return ServiceResolver.getInstance().getService(CommandApi.class);
+			return ServiceResolver.getInstance().required(CommandApi.class);
 		}
 	}
 

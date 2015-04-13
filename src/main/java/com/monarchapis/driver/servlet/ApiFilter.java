@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.servlet;
 
 import java.io.IOException;
@@ -25,6 +42,13 @@ import com.monarchapis.driver.model.OperationNameHolder;
 import com.monarchapis.driver.model.VersionHolder;
 import com.monarchapis.driver.util.ServiceResolver;
 
+/**
+ * A servlet filter that handles wrapping the request and response, continuing
+ * the request down the filter chain, and sending the traffic statistics to the
+ * {@link AnalyticsHandler}.
+ * 
+ * @author Phil Kedy
+ */
 public class ApiFilter implements Filter {
 	private static Logger logger = LoggerFactory.getLogger(ApiFilter.class);
 
@@ -65,12 +89,23 @@ public class ApiFilter implements Filter {
 	public void destroy() {
 	}
 
+	/**
+	 * If an {@link AnalyticsHandler} is defined, it will invoke the collect
+	 * method in order to send traffic statistics to the analytics engine.
+	 * 
+	 * @param request
+	 *            The API request
+	 * @param response
+	 *            The API response
+	 * @param begin
+	 *            The time in milliseconds when the request began.
+	 */
 	private void captureResults(ApiRequest request, ApiResponse response, long begin) {
 		try {
 			long ms = System.currentTimeMillis() - begin;
 
 			boolean bypassAnalytics = BooleanUtils.isTrue(BypassAnalyticsHolder.getCurrent());
-			Optional<AnalyticsHandler> handler = ServiceResolver.getInstance().getOptional(AnalyticsHandler.class);
+			Optional<AnalyticsHandler> handler = ServiceResolver.getInstance().optional(AnalyticsHandler.class);
 
 			if (bypassAnalytics || !handler.isPresent()) {
 				return;

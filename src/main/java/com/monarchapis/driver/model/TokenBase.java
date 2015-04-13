@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.model;
 
 import java.util.Map;
@@ -6,14 +23,53 @@ import java.util.Set;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+/**
+ * Represents the common properties between {@link Token} and
+ * {@link TokenRequest}.
+ * 
+ * @author Phil Kedy
+ */
 public class TokenBase {
+	/**
+	 * The grant type;
+	 */
 	private String grantType;
+
+	/**
+	 * The token type (e.g. Bearer)
+	 */
 	private String tokenType;
+
+	/**
+	 * The token's permissions typically granted by an end user via an
+	 * authorization application such as OAuth.
+	 */
 	private Set<String> permissions;
+
+	/**
+	 * The token state.
+	 */
 	private String state;
+
+	/**
+	 * The token callback URI.
+	 */
 	private String uri;
+
+	/**
+	 * The token's associated user identifier.
+	 */
 	private String userId;
+
+	/**
+	 * The token's optional user context (e.g. user name instead of user id)
+	 */
 	private String userContext;
+
+	/**
+	 * The token's extended information. This can hold session ids to other
+	 * backend systems, for example.
+	 */
 	private Map<String, Object> extended;
 
 	public String getGrantType() {
