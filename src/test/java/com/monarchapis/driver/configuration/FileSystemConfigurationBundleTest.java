@@ -17,25 +17,38 @@
 
 package com.monarchapis.driver.configuration;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class FileSystemConfigurationBundleTest extends AbstractConfigurationBundleTest {
-	private FileSystemConfigurationBundle bundle1;
-	private FileSystemConfigurationBundle bundle2;
-
 	@Before
 	public void setup() {
 		File baseDir = new File("src/test/resources/com/monarchapis/driver/configuration");
-		bundle1 = new FileSystemConfigurationBundle(baseDir, "Base1");
-		bundle2 = new FileSystemConfigurationBundle(baseDir, "Base2");
-		setBundle(new MultiConfigurationBundle(bundle1, bundle2));
+		setBundle(new FileSystemConfigurationBundle(baseDir, "Base1", "Base2"));
 	}
 
 	@Test
-	public void testOtherConstructors() {
+	public void testOtherConstructors() throws IOException {
+		FileSystemConfigurationBundle bundle = new FileSystemConfigurationBundle();
 
+		String[] prefixes = bundle.getPrefixes();
+		assertNotNull(prefixes);
+		assertEquals(0, prefixes.length);
+
+		File baseDir = bundle.getBaseDir();
+		File expected = new File(System.getProperty("user.dir"));
+		assertNotNull(baseDir);
+		assertEquals(expected.getCanonicalPath(), baseDir.getCanonicalPath());
+
+		bundle.setPrefix("test");
+		prefixes = bundle.getPrefixes();
+		assertNotNull(prefixes);
+		assertEquals(1, prefixes.length);
+		assertEquals("test", prefixes[0]);
 	}
 }

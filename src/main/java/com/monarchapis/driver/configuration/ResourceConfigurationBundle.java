@@ -127,9 +127,7 @@ public class ResourceConfigurationBundle extends AbstractConfigurationBundle {
 		String variantPart = StringUtils.isNotBlank(variant) ? "_" + variant : "";
 		List<Configuration> configs = new ArrayList<Configuration>();
 
-		for (int i = basenames.length - 1; i >= 0; i--) {
-			String basename = basenames[i];
-
+		for (String basename : basenames) {
 			while (basename.startsWith("/")) {
 				basename = basename.substring(1);
 			}

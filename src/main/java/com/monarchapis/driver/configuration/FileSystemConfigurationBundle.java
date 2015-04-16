@@ -19,6 +19,8 @@ package com.monarchapis.driver.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -30,6 +32,11 @@ import org.apache.commons.lang3.Validate;
  */
 public class FileSystemConfigurationBundle extends AbstractConfigurationBundle {
 	/**
+	 * A single reference of an empty array for the default constructor to use.
+	 */
+	private static String[] EMPTY_STRING_ARRAY = new String[0];
+
+	/**
 	 * The base directory location to search for configuration files.
 	 */
 	private File baseDir;
@@ -37,14 +44,16 @@ public class FileSystemConfigurationBundle extends AbstractConfigurationBundle {
 	/**
 	 * The file name prefix to load.
 	 */
-	private String prefix;
+	private String[] prefixes;
 
 	public FileSystemConfigurationBundle() {
+		setBaseDir(new File(System.getProperty("user.dir")));
+		setPrefixes(EMPTY_STRING_ARRAY);
 	}
 
-	public FileSystemConfigurationBundle(File baseDir, String prefix) {
+	public FileSystemConfigurationBundle(File baseDir, String... prefixes) {
 		setBaseDir(baseDir);
-		setPrefix(prefix);
+		setPrefixes(prefixes);
 	}
 
 	public File getBaseDir() {
@@ -58,38 +67,43 @@ public class FileSystemConfigurationBundle extends AbstractConfigurationBundle {
 		this.baseDir = baseDir;
 	}
 
-	public String getPrefix() {
-		return prefix;
+	public String[] getPrefixes() {
+		return prefixes;
 	}
 
 	public void setPrefix(String prefix) {
-		Validate.notNull(prefix, "String prefix is a required parameter.");
+		Validate.notNull(prefix, "prefix is a required parameter.");
 
-		this.prefix = prefix;
+		this.prefixes = new String[] { prefix };
+	}
+
+	public void setPrefixes(String... prefixes) {
+		Validate.notNull(prefixes, "prefixes is a required parameter.");
+
+		this.prefixes = prefixes;
 	}
 
 	@Override
 	protected Configuration[] loadConfigurationsVariant(String variant) throws IOException {
-		if (baseDir == null || prefix == null) {
-			return null;
-		}
-
 		String v = StringUtils.isNotBlank(variant) ? "_" + variant : "";
+		List<Configuration> configs = new ArrayList<Configuration>();
 
-		for (String extension : EXTENSIONS) {
-			String filename = prefix + v + '.' + extension;
-			File file = new File(baseDir, filename);
+		for (String prefix : prefixes) {
+			for (String extension : EXTENSIONS) {
+				String filename = prefix + v + '.' + extension;
+				File file = new File(baseDir, filename);
 
-			if (!file.exists()) {
-				continue;
+				if (!file.exists()) {
+					continue;
+				}
+
+				LoadableConfiguration configuration = newConfiguration(extension);
+				configuration.load(file);
+
+				configs.add(configuration);
 			}
-
-			LoadableConfiguration configuration = newConfiguration(extension);
-			configuration.load(file);
-
-			return new Configuration[] { configuration };
 		}
 
-		return null;
+		return configs.toArray(new Configuration[configs.size()]);
 	}
 }

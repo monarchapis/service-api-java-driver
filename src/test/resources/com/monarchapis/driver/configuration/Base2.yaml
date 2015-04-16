@@ -2,3 +2,4 @@ string2  : "string"
 integer2 : 1
 number2  : 1.2
 boolean2 : true
+override : "value 2"

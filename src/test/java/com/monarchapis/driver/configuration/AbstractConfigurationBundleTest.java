@@ -152,4 +152,10 @@ public abstract class AbstractConfigurationBundleTest {
 		actual = bundle.getBoolean("boolean3", noVariants);
 		assertEquals(Optional.absent(), actual);
 	}
+
+	@Test
+	public void testOverride() {
+		Optional<String> actual = bundle.getString("override", enVariants);
+		assertEquals(Optional.of("value 2"), actual);
+	}
 }
