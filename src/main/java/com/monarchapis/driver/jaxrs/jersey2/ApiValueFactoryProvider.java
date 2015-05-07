@@ -27,14 +27,15 @@ import org.glassfish.jersey.server.internal.inject.MultivaluedParameterExtractor
 import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
 import org.glassfish.jersey.server.model.Parameter;
 
+import com.monarchapis.api.v1.client.CommandApi;
+import com.monarchapis.api.v1.client.ServiceApi;
 import com.monarchapis.driver.annotation.ApiInject;
-import com.monarchapis.driver.model.ApiContext;
-import com.monarchapis.driver.service.v1.CommandApi;
-import com.monarchapis.driver.service.v1.ServiceApi;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.util.ServiceResolver;
 
 /**
- * Class to automatically inject {@link ApiContext}, {@link ServiceApi}, and
+ * Class to automatically inject {@link Claims}, {@link ServiceApi}, and
  * {@link CommandApi} into resources.
  * 
  * @author Phil Kedy
@@ -44,8 +45,7 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 
 	/**
 	 * Injection resolver for {@link ApiInject} annotation. Will create a
-	 * Factory Provider for the actual resolving of the {@link ApiContext}
-	 * object.
+	 * Factory Provider for the actual resolving of the {@link Claims} object.
 	 */
 	@Singleton
 	static final class InjectionResolver extends ParamInjectionResolver<ApiInject> {
@@ -62,15 +62,15 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 	 * Factory implementation for resolving request-based attributes and other
 	 * information.
 	 */
-	private static final class ApiContextValueFactory extends AbstractContainerRequestValueFactory<ApiContext> {
+	private static final class ClaimsValueFactory extends AbstractContainerRequestValueFactory<Claims> {
 		/**
 		 * Fetch the ApiContext object from the request.
 		 * 
-		 * @return {@link ApiContext} stored on the request, or NULL if no
-		 *         object was found.
+		 * @return {@link Claims} stored on the request, or NULL if no object
+		 *         was found.
 		 */
-		public ApiContext provide() {
-			return ApiContext.getCurrent();
+		public Claims provide() {
+			return ClaimsHolder.getCurrent();
 		}
 	}
 
@@ -102,21 +102,20 @@ final class ApiValueFactoryProvider extends AbstractValueFactoryProvider {
 
 	/**
 	 * Return a factory for the provided parameter. We only expect
-	 * {@link ApiContext} objects being annotated with {@link ApiInject}
-	 * annotation
+	 * {@link Claims} objects being annotated with {@link ApiInject} annotation
 	 * 
 	 * @param parameter
 	 *            Parameter that was annotated for being injected
-	 * @return {@link ApiContextValueFactory} if parameter matched
-	 *         {@link ApiContext} type
+	 * @return {@link ClaimsValueFactory} if parameter matched {@link Claims}
+	 *         type
 	 */
 	@Override
 	public AbstractContainerRequestValueFactory<?> createValueFactory(Parameter parameter) {
 		Class<?> classType = parameter.getRawType();
 
 		if (classType != null) {
-			if (classType.equals(ApiContext.class)) {
-				return new ApiContextValueFactory();
+			if (classType.equals(Claims.class)) {
+				return new ClaimsValueFactory();
 			} else if (classType.equals(ServiceApi.class)) {
 				return new ServiceApiValueFactory();
 			} else if (classType.equals(CommandApi.class)) {

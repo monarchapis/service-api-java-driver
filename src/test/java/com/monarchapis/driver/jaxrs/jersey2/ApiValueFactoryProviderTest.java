@@ -33,15 +33,16 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
-import com.monarchapis.driver.model.ApiContext;
-import com.monarchapis.driver.service.v1.CommandApi;
-import com.monarchapis.driver.service.v1.ServiceApi;
+import com.monarchapis.api.v1.client.CommandApi;
+import com.monarchapis.api.v1.client.ServiceApi;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.util.ServiceResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApiValueFactoryProviderTest {
 	@Mock
-	private ApiContext apiContext;
+	private Claims apiContext;
 
 	@Mock
 	private ServiceResolver serviceResolver;
@@ -64,12 +65,12 @@ public class ApiValueFactoryProviderTest {
 		when(serviceResolver.required(ServiceApi.class)).thenReturn(serviceApi);
 		when(serviceResolver.required(CommandApi.class)).thenReturn(commandApi);
 
-		ApiContext.setCurrent(apiContext);
+		ClaimsHolder.setCurrent(apiContext);
 	}
 
 	@After
 	public void teardown() {
-		ApiContext.remove();
+		ClaimsHolder.remove();
 		ServiceResolver.setInstance(null);
 	}
 
@@ -78,7 +79,7 @@ public class ApiValueFactoryProviderTest {
 		when(parameter.getRawType()).then(new Answer<Class<?>>() {
 			@Override
 			public Class<?> answer(InvocationOnMock invocation) throws Throwable {
-				return ApiContext.class;
+				return Claims.class;
 			}
 		});
 

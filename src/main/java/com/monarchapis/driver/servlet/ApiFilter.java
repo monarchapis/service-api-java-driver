@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.monarchapis.driver.analytics.AnalyticsHandler;
-import com.monarchapis.driver.model.ApiContext;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.model.HttpResponseHolder;
@@ -75,7 +75,7 @@ public class ApiFilter implements Filter {
 		} finally {
 			captureResults(apiRequest, apiResponse, begin);
 
-			ApiContext.remove();
+			ClaimsHolder.remove();
 			ApiRequest.remove();
 			HttpResponseHolder.remove();
 			OperationNameHolder.remove();

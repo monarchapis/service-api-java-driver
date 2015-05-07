@@ -27,13 +27,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.monarchapis.driver.model.Reference;
-import com.monarchapis.driver.model.ServiceInfo;
+import com.google.common.base.Optional;
+import com.monarchapis.api.v1.client.OpenApi;
+import com.monarchapis.api.v1.client.OpenResource;
+import com.monarchapis.api.v1.model.Reference;
+import com.monarchapis.api.v1.model.ServiceInfo;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SingleServiceInfoResolverTest {
 	@Mock
 	private OpenApi openApi;
+
+	@Mock
+	private OpenResource openResource;
 
 	@InjectMocks
 	private SingleServiceInfoResolver resolver;
@@ -43,10 +49,19 @@ public class SingleServiceInfoResolverTest {
 	@Before
 	public void setup() {
 		serviceInfo = new ServiceInfo();
-		serviceInfo.setEnvironment(new Reference("id", "name"));
-		serviceInfo.setProvider(new Reference("id", "name"));
-		serviceInfo.setService(new Reference("id", "name"));
-		when(openApi.getServiceInfo("environment", "service", "provider")).thenReturn(serviceInfo);
+		serviceInfo.setEnvironment(reference("id", "name"));
+		serviceInfo.setProvider(Optional.of(reference("id", "name")));
+		serviceInfo.setService(Optional.of(reference("id", "name")));
+		when(openApi.getOpenResource()).thenReturn(openResource);
+		when(openResource.getServiceInfo("environment", "service", "provider")).thenReturn(serviceInfo);
+	}
+
+	private Reference reference(String id, String name) {
+		Reference ref = new Reference();
+		ref.setId(id);
+		ref.setName(name);
+
+		return ref;
 	}
 
 	@Test
@@ -64,7 +79,7 @@ public class SingleServiceInfoResolverTest {
 		actual = resolver.getServiceInfo("/path");
 		actual = resolver.getServiceInfo("/path");
 
-		verify(openApi).getServiceInfo("environment", "service", "provider");
+		verify(openResource).getServiceInfo("environment", "service", "provider");
 		assertSame(serviceInfo, actual);
 	}
 }

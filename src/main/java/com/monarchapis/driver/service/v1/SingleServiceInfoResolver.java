@@ -22,7 +22,10 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.monarchapis.driver.model.ServiceInfo;
+import com.monarchapis.api.v1.client.OpenApi;
+import com.monarchapis.api.v1.client.OpenResource;
+import com.monarchapis.api.v1.model.Reference;
+import com.monarchapis.api.v1.model.ServiceInfo;
 
 public class SingleServiceInfoResolver implements ServiceInfoResolver {
 	private static Logger logger = LoggerFactory.getLogger(SingleServiceInfoResolver.class);
@@ -48,11 +51,24 @@ public class SingleServiceInfoResolver implements ServiceInfoResolver {
 	public ServiceInfo getServiceInfo(String path) {
 		if (serviceInfo == null) {
 			logger.info("Looking up Service Information for {}/{}...", environmentName, serviceName);
-			serviceInfo = openApi.getServiceInfo(environmentName, serviceName, providerKey);
-			logger.info("Service initialized: {}", serviceInfo);
+			OpenResource open = openApi.getOpenResource();
+			serviceInfo = open.getServiceInfo(environmentName, serviceName, providerKey);
+
+			logger.info("Service initialized: environment: {} / service: {} / provider: {}",
+					referenceKVP(serviceInfo.getEnvironment()), //
+					referenceKVP(serviceInfo.getService().orNull()), //
+					referenceKVP(serviceInfo.getProvider().orNull()));
 		}
 
 		return serviceInfo;
+	}
+
+	private String referenceKVP(Reference reference) {
+		if (reference == null) {
+			return "null";
+		}
+
+		return reference.getName() + " = " + reference.getId();
 	}
 
 	public void setOpenApi(OpenApi openApi) {

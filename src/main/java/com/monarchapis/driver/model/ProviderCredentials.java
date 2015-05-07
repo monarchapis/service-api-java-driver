@@ -26,47 +26,47 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * 
  * @author Phil Kedy
  */
-public class ProviderCredentials {
-	/**
-	 * The API key.
-	 */
-	private String apiKey;
-
-	/**
-	 * The shared secret.
-	 */
-	private String sharedSecret;
-
-	public ProviderCredentials() {
-	}
-
-	public ProviderCredentials(String apiKeyt) {
-		setApiKey(apiKey);
-	}
-
-	public ProviderCredentials(String apiKey, String shareSecret) {
-		setApiKey(apiKey);
-		this.sharedSecret = shareSecret;
-	}
-
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		Validate.notBlank(apiKey, "apiKey is required.");
-		this.apiKey = apiKey;
-	}
-
-	public String getSharedSecret() {
-		return sharedSecret;
-	}
-
-	public void setSharedSecret(String sharedSecret) {
-		this.sharedSecret = sharedSecret;
-	}
-
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-	}
-}
+//public class ProviderCredentials {
+//	/**
+//	 * The API key.
+//	 */
+//	private String apiKey;
+//
+//	/**
+//	 * The shared secret.
+//	 */
+//	private String sharedSecret;
+//
+//	public ProviderCredentials() {
+//	}
+//
+//	public ProviderCredentials(String apiKeyt) {
+//		setApiKey(apiKey);
+//	}
+//
+//	public ProviderCredentials(String apiKey, String shareSecret) {
+//		setApiKey(apiKey);
+//		this.sharedSecret = shareSecret;
+//	}
+//
+//	public String getApiKey() {
+//		return apiKey;
+//	}
+//
+//	public void setApiKey(String apiKey) {
+//		Validate.notBlank(apiKey, "apiKey is required.");
+//		this.apiKey = apiKey;
+//	}
+//
+//	public String getSharedSecret() {
+//		return sharedSecret;
+//	}
+//
+//	public void setSharedSecret(String sharedSecret) {
+//		this.sharedSecret = sharedSecret;
+//	}
+//
+//	public String toString() {
+//		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+//	}
+//}

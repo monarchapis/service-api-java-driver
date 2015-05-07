@@ -15,10 +15,29 @@
  * limitations under the License.
  */
 
-package com.monarchapis.driver.service.v1;
+package com.monarchapis.driver.model;
 
-import com.monarchapis.driver.model.ServiceInfo;
+import java.util.Set;
 
-public interface OpenApi {
-	public ServiceInfo getServiceInfo(String environmentName, String serviceName, String providerKey);
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+public class Authorizable {
+	@NotNull
+	private Set<String> permissions;
+
+	public Set<String> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<String> permissions) {
+		this.permissions = permissions;
+	}
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	}
 }

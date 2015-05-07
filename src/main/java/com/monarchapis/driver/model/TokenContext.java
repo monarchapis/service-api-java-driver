@@ -17,33 +17,17 @@
 
 package com.monarchapis.driver.model;
 
-import java.util.Map;
-import java.util.Set;
+import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import com.monarchapis.api.v1.model.Extended;
 
-/**
- * Represents token context details returned by the request authentication call.
- * These fields can be used for authorization or custom logic in your API code.
- * 
- * @author Phil Kedy
- */
-public class TokenContext {
-	/**
-	 * The token identifier.
-	 */
+public class TokenContext extends Authorizable {
+
+	@NotNull
 	private String id;
 
-	/**
-	 * The token permissions.
-	 */
-	private Set<String> permissions;
-
-	/**
-	 * The token's extended information.
-	 */
-	private Map<String, String> extended;
+	@NotNull
+	private Extended extended;
 
 	public String getId() {
 		return id;
@@ -53,35 +37,11 @@ public class TokenContext {
 		this.id = id;
 	}
 
-	public Set<String> getPermissions() {
-		return permissions;
-	}
-
-	public void setPermissions(Set<String> permissions) {
-		this.permissions = permissions;
-	}
-
-	public boolean hasPermission(String permission) {
-		return permissions != null && permissions.contains(permission);
-	}
-
-	public Map<String, String> getExtended() {
+	public Extended getExtended() {
 		return extended;
 	}
 
-	public void setExtended(Map<String, String> extended) {
+	public void setExtended(Extended extended) {
 		this.extended = extended;
-	}
-
-	public String getExtended(String key) {
-		if (extended == null) {
-			return null;
-		}
-
-		return extended.get(key);
-	}
-
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 }

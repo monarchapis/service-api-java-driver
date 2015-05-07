@@ -17,47 +17,13 @@
 
 package com.monarchapis.driver.model;
 
-/**
- * Represents a reference to an entity in Monarch.
- * 
- * @author Phil Kedy
- */
-public class Reference {
-	/**
-	 * The referenced entity's identifier.
-	 */
-	private String id;
+public interface ClaimNames {
+	public static final String ID = "jti";
+	public static final String SUBJECT = "sub";
 
-	/**
-	 * The referenced entity's name.
-	 */
-	private String name;
-
-	public Reference() {
-	}
-
-	public Reference(String id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String toString() {
-		return name + " = " + id;
-	}
+	public static final String APPLICATION = "http://monarchapis.com/claims/application";
+	public static final String CLIENT = "http://monarchapis.com/claims/client";
+	public static final String PROVIDER = "http://monarchapis.com/claims/provider";
+	public static final String TOKEN = "http://monarchapis.com/claims/token";
+	public static final String PRINCIPAL = "http://monarchapis.com/claims/principal";
 }

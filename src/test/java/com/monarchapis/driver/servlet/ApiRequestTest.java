@@ -43,7 +43,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.google.common.collect.Lists;
-import com.monarchapis.driver.model.AuthenticationRequest;
 import com.monarchapis.driver.model.AuthenticationSettings;
 import com.monarchapis.driver.util.ServiceResolver;
 
@@ -174,20 +173,20 @@ public class ApiRequestTest {
 		assertEquals("10.0.0.1", apiRequest.getIpAddress());
 	}
 
-	@Test
-	public void testCreateAuthorizationRequest() {
-		AuthenticationRequest request = apiRequest.createAuthorizationRequest();
-		assertEquals("http", request.getProtocol());
-		assertEquals("localhost", request.getHost());
-		assertEquals(8080, request.getPort());
-		assertEquals("/test", request.getPath());
-		assertEquals("a=1&b=2", request.getQuerystring());
-		assertEquals("127.0.0.1", request.getIpAddress());
-		Map<String, List<String>> headers = request.getHeaders();
-		assertEquals(Lists.newArrayList("name1-value1", "name1-value2"), headers.get("name1"));
-		assertEquals(Lists.newArrayList("name2-value1", "name2-value2"), headers.get("name2"));
-		assertNull(headers.get("doesnotexist"));
-	}
+//	@Test
+//	public void testCreateAuthorizationRequest() {
+//		AuthenticationRequest request = apiRequest.createAuthorizationRequest();
+//		assertEquals("http", request.getProtocol());
+//		assertEquals("localhost", request.getHost());
+//		assertEquals(8080, request.getPort());
+//		assertEquals("/test", request.getPath());
+//		assertEquals("a=1&b=2", request.getQuerystring());
+//		assertEquals("127.0.0.1", request.getIpAddress());
+//		Map<String, List<String>> headers = request.getHeaders();
+//		assertEquals(Lists.newArrayList("name1-value1", "name1-value2"), headers.get("name1"));
+//		assertEquals(Lists.newArrayList("name2-value1", "name2-value2"), headers.get("name2"));
+//		assertNull(headers.get("doesnotexist"));
+//	}
 
 	@Test
 	public void testGetDataSize() {

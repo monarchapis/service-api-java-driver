@@ -17,7 +17,7 @@
 
 package com.monarchapis.driver.service.v1;
 
-import com.monarchapis.driver.model.ServiceInfo;
+import com.monarchapis.api.v1.model.ServiceInfo;
 
 public interface ServiceInfoResolver {
 	public ServiceInfo getServiceInfo(String path);
