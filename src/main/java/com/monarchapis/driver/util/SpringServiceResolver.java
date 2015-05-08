@@ -17,6 +17,9 @@
 
 package com.monarchapis.driver.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -71,5 +74,19 @@ public class SpringServiceResolver extends ServiceResolver implements Applicatio
 		} catch (BeansException be) {
 			return Optional.absent();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> getInstancesOf(Class<T> clazz) {
+		String[] names = applicationContext.getBeanNamesForType(clazz);
+
+		List<T> beans = new ArrayList<T>(names.length);
+
+		for (String name : names) {
+			beans.add((T) applicationContext.getBean(name));
+		}
+
+		return beans;
 	}
 }

@@ -18,6 +18,7 @@
 package com.monarchapis.driver.servlet;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,10 +33,13 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
 import com.monarchapis.driver.analytics.AnalyticsHandler;
-import com.monarchapis.driver.model.ClaimsHolder;
+import com.monarchapis.driver.authentication.ClaimsProcessor;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.model.HttpResponseHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
@@ -57,6 +61,10 @@ public class ApiFilter implements Filter {
 	}
 
 	@Override
+	public void destroy() {
+	}
+
+	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
 			ServletException {
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -70,6 +78,8 @@ public class ApiFilter implements Filter {
 			HttpResponseHolder.setCurrent(apiResponse);
 			ApiRequest.setCurrent(apiRequest);
 			VersionHolder.setCurrent("1"); // Default
+
+			readClaimsFromRequest(apiRequest);
 
 			chain.doFilter(apiRequest, apiResponse);
 		} finally {
@@ -85,8 +95,18 @@ public class ApiFilter implements Filter {
 		}
 	}
 
-	@Override
-	public void destroy() {
+	private void readClaimsFromRequest(ApiRequest apiRequest) {
+		List<ClaimsProcessor> processors = ServiceResolver.getInstance().getInstancesOf(ClaimsProcessor.class);
+
+		for (ClaimsProcessor processor : processors) {
+			ObjectNode claims = processor.getClaims(apiRequest);
+
+			if (claims != null) {
+				ClaimsHolder.setCurrent(new Claims(claims));
+
+				return;
+			}
+		}
 	}
 
 	/**

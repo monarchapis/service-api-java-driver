@@ -11,6 +11,8 @@
 
 	<bean id="serviceResolver" class="com.monarchapis.driver.util.SpringServiceResolver" />
 
+	<bean id="jwtDecryptor" class="com.monarchapis.driver.authentication.JwtClaimsProcessor" />
+
 	<util:list id="requestProcessors">
 		<bean class="com.monarchapis.client.authentication.HawkV1RequestProcessor">
 			<constructor-arg value="${monarch.providerKey}" />
@@ -65,7 +67,9 @@
 	<bean id="openApi" class="com.monarchapis.api.v1.client.impl.OpenApiImpl">
 		<constructor-arg value="${monarch.url}/open/v1" />
 		<constructor-arg ref="restClientFactory" />
-		<constructor-arg><util:list /></constructor-arg>
+		<constructor-arg>
+			<util:list />
+		</constructor-arg>
 	</bean>
 
 	<bean id="serviceApi" class="com.monarchapis.api.v1.client.impl.ServiceApiImpl">
