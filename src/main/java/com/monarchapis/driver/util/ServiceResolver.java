@@ -20,7 +20,6 @@ package com.monarchapis.driver.util;
 import java.util.List;
 
 import com.google.common.base.Optional;
-import com.monarchapis.driver.authentication.ClaimsProcessor;
 
 /**
  * Provides a singleton for looking up beans.
