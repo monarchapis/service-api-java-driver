@@ -117,7 +117,7 @@ public class AuthenticatorV1Impl implements Authenticator {
 		// Only check delegated permissions if a token is part of the API
 		// context.
 		if (delegated != null && delegated.length > 0 && claimSet.hasClaim(ClaimNames.TOKEN)) {
-			if (!claimSet.hasClaim(ClaimNames.PRINCIPAL)) {
+			if (!claimSet.hasClaim(ClaimNames.SUBJECT)) {
 				throw apiErrorFactory.exception("invalidAccessToken");
 			}
 
@@ -127,7 +127,7 @@ public class AuthenticatorV1Impl implements Authenticator {
 		}
 
 		if (user) {
-			if (!claimSet.hasClaim(ClaimNames.PRINCIPAL)) {
+			if (!claimSet.hasClaim(ClaimNames.SUBJECT)) {
 				throw apiErrorFactory.exception("invalidAccessToken");
 			}
 		}
