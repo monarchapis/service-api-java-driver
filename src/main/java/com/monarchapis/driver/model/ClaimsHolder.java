@@ -17,50 +17,44 @@
 
 package com.monarchapis.driver.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * Represents a single HTTP request/response header.
+ * Stores the current {@link Claims} in a thread local.
  * 
  * @author Phil Kedy
  */
-public class HttpHeader {
+public abstract class ClaimsHolder {
 	/**
-	 * The header name.
+	 * The current API error instance, if an error was thrown.
 	 */
-	private String name;
+	private static InheritableThreadLocal<Claims> current = new InheritableThreadLocal<Claims>();
 
-	/**
-	 * The header value.
-	 */
-	private String value;
+	private static boolean autoCreate = true;
 
-	public HttpHeader() {
+	public static Claims getCurrent() {
+		Claims claims = current.get();
+
+		if (claims == null && autoCreate) {
+			claims = new Claims();
+			current.set(claims);
+		}
+
+		return claims;
 	}
 
-	public HttpHeader(String name, String value) {
-		this.name = name;
-		this.value = value;
+	public static void setCurrent(Claims error) {
+		if (error != null) {
+			current.set(error);
+		} else {
+			current.remove();
+		}
 	}
 
-	public String getName() {
-		return name;
+	public static void remove() {
+		current.remove();
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+	public static void setAutoCreate(boolean value) {
+		autoCreate = value;
 	}
 }

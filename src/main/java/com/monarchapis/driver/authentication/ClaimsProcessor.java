@@ -15,49 +15,12 @@
  * limitations under the License.
  */
 
-package com.monarchapis.driver.model;
+package com.monarchapis.driver.authentication;
 
-/**
- * Represents a reference to an entity in Monarch.
- * 
- * @author Phil Kedy
- */
-public class Reference {
-	/**
-	 * The referenced entity's identifier.
-	 */
-	private String id;
+import javax.servlet.http.HttpServletRequest;
 
-	/**
-	 * The referenced entity's name.
-	 */
-	private String name;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-	public Reference() {
-	}
-
-	public Reference(String id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String toString() {
-		return name + " = " + id;
-	}
+public interface ClaimsProcessor {
+	ObjectNode getClaims(HttpServletRequest request);
 }

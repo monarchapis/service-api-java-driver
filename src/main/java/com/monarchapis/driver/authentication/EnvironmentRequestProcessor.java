@@ -15,26 +15,38 @@
  * limitations under the License.
  */
 
-package com.monarchapis.driver.service.v1.impl;
+package com.monarchapis.driver.authentication;
 
 import javax.inject.Inject;
 
-import com.google.api.client.http.HttpHeaders;
-import com.google.api.client.http.HttpRequest;
-import com.monarchapis.driver.model.ServiceInfo;
+import com.monarchapis.api.v1.model.ServiceInfo;
+import com.monarchapis.client.rest.BaseClient;
+import com.monarchapis.client.rest.RequestProcessor;
 import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 
-public abstract class AbstractEnvironmentDriver extends AbstractDriver {
+public class EnvironmentRequestProcessor implements RequestProcessor {
 	@Inject
 	private ServiceInfoResolver serviceInfoResolver;
 
-	@Override
-	protected void setCustomHeaders(HttpRequest request, HttpHeaders headers) {
-		ServiceInfo serviceInfo = serviceInfoResolver.getServiceInfo(request.getUrl().getRawPath());
-		headers.set("X-Environment-Id", serviceInfo.getEnvironment().getId());
+	public EnvironmentRequestProcessor() {
+	}
+
+	public EnvironmentRequestProcessor(ServiceInfoResolver serviceInfoResolver) {
+		this.serviceInfoResolver = serviceInfoResolver;
+	}
+
+	public ServiceInfoResolver getServiceInfoResolver() {
+		return serviceInfoResolver;
 	}
 
 	public void setServiceInfoResolver(ServiceInfoResolver serviceInfoResolver) {
 		this.serviceInfoResolver = serviceInfoResolver;
+	}
+
+	@Override
+	public void processRequest(BaseClient<?> client) {
+		ServiceInfo serviceInfo = serviceInfoResolver.getServiceInfo(client.getPath());
+
+		client.addHeader("X-Environment-Id", serviceInfo.getEnvironment().getId());
 	}
 }

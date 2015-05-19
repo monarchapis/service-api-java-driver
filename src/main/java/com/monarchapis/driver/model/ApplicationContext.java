@@ -17,31 +17,23 @@
 
 package com.monarchapis.driver.model;
 
-import java.util.Map;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-/**
- * Represents an application context.
- * 
- * @author Phil Kedy
- */
+import com.google.common.base.Optional;
+import com.monarchapis.api.v1.model.Extended;
+
 public class ApplicationContext {
-	/**
-	 * The application identifier.
-	 */
+
+	@NotNull
 	private String id;
 
-	/**
-	 * The application name.
-	 */
-	private String name;
+	private Optional<String> name = Optional.absent();
 
-	/**
-	 * The application extended data.
-	 */
-	private Map<String, String> extended;
+	@NotNull
+	private Extended extended;
 
 	public String getId() {
 		return id;
@@ -51,22 +43,23 @@ public class ApplicationContext {
 		this.id = id;
 	}
 
-	public String getName() {
+	public Optional<String> getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Optional<String> name) {
 		this.name = name;
 	}
 
-	public Map<String, String> getExtended() {
+	public Extended getExtended() {
 		return extended;
 	}
 
-	public void setExtended(Map<String, String> extended) {
+	public void setExtended(Extended extended) {
 		this.extended = extended;
 	}
 
+	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}

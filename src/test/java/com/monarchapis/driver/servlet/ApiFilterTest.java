@@ -43,7 +43,8 @@ import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Optional;
 import com.monarchapis.driver.analytics.AnalyticsHandler;
-import com.monarchapis.driver.model.ApiContext;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.util.ServiceResolver;
@@ -95,7 +96,7 @@ public class ApiFilterTest {
 				assertTrue(request instanceof ApiRequest);
 				assertTrue(response instanceof ApiResponse);
 
-				ApiContext context = ApiContext.getCurrent();
+				Claims context = ClaimsHolder.getCurrent();
 				assertNotNull(context);
 
 				ApiRequest apiRequest = ApiRequest.getCurrent();

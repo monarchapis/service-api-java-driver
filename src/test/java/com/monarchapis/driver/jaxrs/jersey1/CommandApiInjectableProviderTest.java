@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.monarchapis.driver.service.v1.CommandApi;
+import com.monarchapis.api.v1.client.CommandApi;
 import com.monarchapis.driver.util.ServiceResolver;
 import com.sun.jersey.api.core.HttpContext;
 

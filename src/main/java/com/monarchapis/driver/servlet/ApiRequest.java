@@ -33,10 +33,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.monarchapis.driver.model.AuthenticationRequest;
-import com.monarchapis.driver.model.AuthenticationSettings;
-import com.monarchapis.driver.util.ServiceResolver;
-
 /**
  * Wrappers a HttpServiceRequest and provides additional methods to support
  * various authentication schemes such as Hawk.
@@ -166,29 +162,6 @@ public class ApiRequest extends HttpServletRequestWrapper {
 		// If there is an X-Forwarded-For header, pull the first IP in the comma
 		// separated list.
 		return (ipAddress != null) ? StringUtils.split(ipAddress, ',')[0].trim() : getRemoteAddr();
-	}
-
-	/**
-	 * Creates an authentication request based on the request.
-	 * 
-	 * @return the created <code>AuthenticationRequest</code> object.
-	 */
-	public AuthenticationRequest createAuthorizationRequest() {
-		AuthenticationRequest auth = new AuthenticationRequest();
-		AuthenticationSettings settings = ServiceResolver.getInstance().required(AuthenticationSettings.class);
-
-		auth.setProtocol(getProtocol());
-		auth.setMethod(getMethod());
-		auth.setHost(getServerName());
-		auth.setPort(getServerPort());
-		auth.setPath(getRequestURI());
-		auth.setQuerystring(getQueryString());
-		auth.setIpAddress(getRemoteAddr());
-		auth.setHeaders(getHeaderMap());
-		auth.setPerformAuthorization(settings.isDelegateAuthorization());
-		auth.setBypassRateLimiting(settings.isBypassRateLimiting());
-
-		return auth;
 	}
 
 	/**

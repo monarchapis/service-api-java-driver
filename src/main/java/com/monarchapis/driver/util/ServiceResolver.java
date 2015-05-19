@@ -17,6 +17,8 @@
 
 package com.monarchapis.driver.util;
 
+import java.util.List;
+
 import com.google.common.base.Optional;
 
 /**
@@ -66,4 +68,6 @@ public abstract class ServiceResolver {
 	 * @return the present bean if found, absent otherwise.
 	 */
 	public abstract <T> Optional<T> optional(Class<T> clazz);
+
+	public abstract <T> List<T> getInstancesOf(Class<T> clazz);
 }

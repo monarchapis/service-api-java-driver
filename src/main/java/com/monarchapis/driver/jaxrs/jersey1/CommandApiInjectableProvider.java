@@ -19,7 +19,7 @@ package com.monarchapis.driver.jaxrs.jersey1;
 
 import javax.ws.rs.ext.Provider;
 
-import com.monarchapis.driver.service.v1.CommandApi;
+import com.monarchapis.api.v1.client.CommandApi;
 import com.monarchapis.driver.util.ServiceResolver;
 import com.sun.jersey.api.core.HttpContext;
 

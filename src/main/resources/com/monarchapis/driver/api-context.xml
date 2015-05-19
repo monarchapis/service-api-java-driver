@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-    
-    <context:annotation-config />
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<context:annotation-config />
 
 	<bean id="serviceResolver" class="com.monarchapis.driver.util.SpringServiceResolver" />
 
-	<bean id="hawkV1AuthenticationSigner"
-		class="com.monarchapis.driver.authentication.HawkV1AuthenticationSigner" />
+	<bean id="jwtDecryptor" class="com.monarchapis.driver.authentication.JwtClaimsProcessor" />
+
+	<util:list id="requestProcessors">
+		<bean class="com.monarchapis.client.authentication.HawkV1RequestProcessor">
+			<constructor-arg value="${monarch.providerKey}" />
+			<constructor-arg value="${monarch.sharedSecret}" />
+			<constructor-arg value="sha256" />
+		</bean>
+		<bean
+			class="com.monarchapis.driver.authentication.EnvironmentRequestProcessor" />
+	</util:list>
 
 	<bean id="hawkV1RequestHasher" class="com.monarchapis.driver.hash.HawkV1RequestHasher" />
 
@@ -26,7 +36,8 @@
 
 	<bean id="requestHasherRegistry" class="com.monarchapis.driver.hash.RequestHasherRegistry" />
 
-	<bean id="configurationBundle" class="com.monarchapis.driver.configuration.ResourceConfigurationBundle">
+	<bean id="configurationBundle"
+		class="com.monarchapis.driver.configuration.ResourceConfigurationBundle">
 		<property name="basename" value="com/monarchapis/driver/Errors" />
 	</bean>
 
@@ -51,27 +62,32 @@
 		<property name="passwordUrl" value="${oauth.password.url}" />
 	</bean>
 
-	<bean id="providerCredentials"
-		class="com.monarchapis.driver.model.ProviderCredentials">
-		<constructor-arg value="${monarch.providerKey}" />
-		<constructor-arg value="${monarch.sharedSecret}" />
+	<bean id="restClientFactory" class="com.monarchapis.client.rest.RestClientFactory" />
+
+	<bean id="openApi" class="com.monarchapis.api.v1.client.impl.OpenApiImpl">
+		<constructor-arg value="${monarch.url}/open/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg>
+			<util:list />
+		</constructor-arg>
 	</bean>
 
-	<bean id="openApi" class="com.monarchapis.driver.service.v1.impl.OpenApiDriver">
-		<property name="baseUrl" value="${monarch.api.service.url}" />
+	<bean id="serviceApi" class="com.monarchapis.api.v1.client.impl.ServiceApiImpl">
+		<constructor-arg value="${monarch.url}/service/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
 	</bean>
 
-	<bean id="serviceApi" class="com.monarchapis.driver.service.v1.impl.ServiceApiDriver">
-		<property name="baseUrl" value="${monarch.api.service.url}" />
+	<bean id="analyticsApi" class="com.monarchapis.api.v1.client.impl.AnalyticsApiImpl">
+		<constructor-arg value="${monarch.url}/analytics/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
 	</bean>
 
-	<bean id="analyticsApi"
-		class="com.monarchapis.driver.service.v1.impl.AnalyticsApiDriver">
-		<property name="baseUrl" value="${monarch.api.analytics.url}" />
-	</bean>
-
-	<bean id="commandApi" class="com.monarchapis.driver.service.v1.impl.CommandApiDriver">
-		<property name="baseUrl" value="${monarch.api.command.url}" />
+	<bean id="commandApi" class="com.monarchapis.api.v1.client.impl.CommandApiImpl">
+		<constructor-arg value="${monarch.url}/command/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
 	</bean>
 
 	<bean id="serviceInfoResolver"

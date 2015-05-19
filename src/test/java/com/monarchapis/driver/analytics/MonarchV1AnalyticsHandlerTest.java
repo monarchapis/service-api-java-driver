@@ -36,27 +36,35 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Optional;
+import com.monarchapis.api.v1.client.AnalyticsApi;
+import com.monarchapis.api.v1.client.EventsResource;
+import com.monarchapis.api.v1.model.ObjectData;
+import com.monarchapis.api.v1.model.Reference;
+import com.monarchapis.api.v1.model.ServiceInfo;
 import com.monarchapis.driver.exception.ApiError;
-import com.monarchapis.driver.model.ApiContext;
 import com.monarchapis.driver.model.ApplicationContext;
+import com.monarchapis.driver.model.ClaimNames;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.ClientContext;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
 import com.monarchapis.driver.model.PrincipalContext;
-import com.monarchapis.driver.model.Reference;
-import com.monarchapis.driver.model.ServiceInfo;
 import com.monarchapis.driver.model.TokenContext;
-import com.monarchapis.driver.service.v1.AnalyticsApi;
 import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 import com.monarchapis.driver.servlet.ApiRequest;
 import com.monarchapis.driver.servlet.ApiResponse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MonarchV1AnalyticsHandlerTest {
-	private ObjectNode objectNode;
+	private ObjectData objectData;
 
 	@Mock
 	private AnalyticsApi analyticsApi;
+
+	@Mock
+	private EventsResource eventsResource;
 
 	@Mock
 	private ServiceInfoResolver serviceInfoResolver;
@@ -71,21 +79,21 @@ public class MonarchV1AnalyticsHandlerTest {
 	private MonarchV1AnalyticsHandler handler;
 
 	@Mock
-	private ApiContext apiContext;
+	private Claims claims;
 
 	@Before
 	public void setup() {
 		OperationNameHolder.remove();
 		ErrorHolder.remove();
-		ApiContext.remove();
-		objectNode = null;
+		ClaimsHolder.remove();
+		objectData = null;
 
 		Reference reference = new Reference();
 		reference.setId("test");
 		reference.setName("test");
 		ServiceInfo serviceInfo = new ServiceInfo();
-		serviceInfo.setService(reference);
-		serviceInfo.setProvider(reference);
+		serviceInfo.setService(Optional.of(reference));
+		serviceInfo.setProvider(Optional.of(reference));
 		when(serviceInfoResolver.getServiceInfo("/test")).thenReturn(serviceInfo);
 
 		final Vector<String> headerNames = new Vector<String>();
@@ -101,51 +109,52 @@ public class MonarchV1AnalyticsHandlerTest {
 		when(request.getHeader("test1")).thenReturn("value1");
 		when(request.getHeader("test2")).thenReturn("value2");
 
+		when(analyticsApi.getEventsResource()).thenReturn(eventsResource);
+
 		doAnswer(new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
-				MonarchV1AnalyticsHandlerTest.this.objectNode = invocation.getArgumentAt(1, ObjectNode.class);
+				MonarchV1AnalyticsHandlerTest.this.objectData = invocation.getArgumentAt(1, ObjectData.class);
 				return null;
 			}
-
-		}).when(analyticsApi).event(anyString(), any(ObjectNode.class));
+		}).when(eventsResource).collectEvent(anyString(), any(ObjectData.class));
 	}
-	
+
 	@After
 	public void cleanup() {
 		OperationNameHolder.remove();
-		ApiContext.remove();
+		ClaimsHolder.remove();
 	}
 
 	@Test
 	public void testReturnWhenAnyPrerequisiteIsNull() {
 		MonarchV1AnalyticsHandler handler = new MonarchV1AnalyticsHandler();
 
-		ApiContext.setAutoCreate(false);
+		ClaimsHolder.setAutoCreate(false);
 		handler.collect(request, response, 100);
-		verify(analyticsApi, never()).event(anyString(), any(ObjectNode.class));
+		verify(eventsResource, never()).collectEvent(anyString(), any(ObjectData.class));
 
-		ApiContext.setAutoCreate(true);
+		ClaimsHolder.setAutoCreate(true);
 		handler.collect(request, response, 100);
-		verify(analyticsApi, never()).event(anyString(), any(ObjectNode.class));
+		verify(eventsResource, never()).collectEvent(anyString(), any(ObjectData.class));
 
 		handler.setAnalyticsApi(analyticsApi);
 		handler.collect(request, response, 100);
-		verify(analyticsApi, never()).event(anyString(), any(ObjectNode.class));
+		verify(eventsResource, never()).collectEvent(anyString(), any(ObjectData.class));
 	}
 
 	@Test
 	public void testOperationNameIsSetToUnknownWhenNull() {
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals("unknown", objectNode.path("operation_name").asText());
+		assertNotNull(objectData);
+		assertEquals("unknown", objectData.get("operation_name"));
 
 		OperationNameHolder.setCurrent("test");
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals("test", objectNode.path("operation_name").asText());
+		assertNotNull(objectData);
+		assertEquals("test", objectData.get("operation_name"));
 	}
 
 	@Test
@@ -162,19 +171,20 @@ public class MonarchV1AnalyticsHandlerTest {
 		PrincipalContext principalContext = mock(PrincipalContext.class);
 		when(principalContext.getId()).thenReturn("test principal id");
 
-		when(apiContext.getApplication()).thenReturn(applicationContext);
-		when(apiContext.getClient()).thenReturn(clientContext);
-		when(apiContext.getToken()).thenReturn(tokenContext);
-		when(apiContext.getPrincipal()).thenReturn(principalContext);
-		ApiContext.setCurrent(apiContext);
+		when(claims.getAs(ApplicationContext.class, ClaimNames.APPLICATION))
+				.thenReturn(Optional.of(applicationContext));
+		when(claims.getAs(ClientContext.class, ClaimNames.CLIENT)).thenReturn(Optional.of(clientContext));
+		when(claims.getAs(TokenContext.class, ClaimNames.TOKEN)).thenReturn(Optional.of(tokenContext));
+		when(claims.getAs(PrincipalContext.class, ClaimNames.PRINCIPAL)).thenReturn(Optional.of(principalContext));
+		ClaimsHolder.setCurrent(claims);
 
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals("test app id", objectNode.path("application_id").asText());
-		assertEquals("test client id", objectNode.path("client_id").asText());
-		assertEquals("test token id", objectNode.path("token_id").asText());
-		assertEquals("test principal id", objectNode.path("user_id").asText());
+		assertNotNull(objectData);
+		assertEquals("test app id", objectData.get("application_id"));
+		assertEquals("test client id", objectData.get("client_id"));
+		assertEquals("test token id", objectData.get("token_id"));
+		assertEquals("test principal id", objectData.get("user_id"));
 	}
 
 	@Test
@@ -182,9 +192,9 @@ public class MonarchV1AnalyticsHandlerTest {
 		when(response.getStatus()).thenReturn(200);
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals(200, objectNode.path("status_code").asInt());
-		assertEquals("ok", objectNode.path("error_reason").asText());
+		assertNotNull(objectData);
+		assertEquals(200, objectData.get("status_code"));
+		assertEquals("ok", objectData.get("error_reason"));
 
 		ApiError error = mock(ApiError.class);
 		when(error.getStatus()).thenReturn(4321);
@@ -192,9 +202,9 @@ public class MonarchV1AnalyticsHandlerTest {
 		ErrorHolder.setCurrent(error);
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals(4321, objectNode.path("status_code").asInt());
-		assertEquals("test", objectNode.path("error_reason").asText());
+		assertNotNull(objectData);
+		assertEquals(4321, objectData.get("status_code"));
+		assertEquals("test", objectData.get("error_reason"));
 	}
 
 	@Test
@@ -202,9 +212,10 @@ public class MonarchV1AnalyticsHandlerTest {
 		when(request.getQueryString()).thenReturn("test1=value%201&test2=value%202&test3");
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals("value 1", objectNode.path("parameters").path("test1").asText());
-		assertEquals("value 2", objectNode.path("parameters").path("test2").asText());
+		assertNotNull(objectData);
+		ObjectNode parameters = (ObjectNode) objectData.get("parameters");
+		assertEquals("value 1", parameters.path("test1").asText());
+		assertEquals("value 2", parameters.path("test2").asText());
 	}
 
 	@Test
@@ -222,8 +233,9 @@ public class MonarchV1AnalyticsHandlerTest {
 	public void testWillParseRequestHeaders() {
 		handler.collect(request, response, 100);
 
-		assertNotNull(objectNode);
-		assertEquals("value1", objectNode.path("headers").path("test1").asText());
-		assertEquals("value2", objectNode.path("headers").path("test2").asText());
+		assertNotNull(objectData);
+		ObjectNode headers = (ObjectNode) objectData.get("headers");
+		assertEquals("value1", headers.path("test1").asText());
+		assertEquals("value2", headers.path("test2").asText());
 	}
 }

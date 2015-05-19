@@ -21,16 +21,17 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.monarchapis.driver.model.ApiContext;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.sun.jersey.api.core.HttpContext;
 
 public class ApiContextInjectableProviderTest {
 	@Test
 	public void testGetValue() {
-		ApiContext expected = new ApiContext();
-		ApiContext.setCurrent(expected);
-		ApiContextInjectableProvider provider = new ApiContextInjectableProvider();
-		ApiContext actual = provider.getValue((HttpContext) null);
-		assertEquals(expected, actual);
+		Claims expected = new Claims();
+		ClaimsHolder.setCurrent(expected);
+		ClaimsInjectableProvider provider = new ClaimsInjectableProvider();
+		Claims actual = provider.getValue((HttpContext) null);
+		assertSame(expected, actual);
 	}
 }

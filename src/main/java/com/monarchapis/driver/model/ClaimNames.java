@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 
-package com.monarchapis.driver.service.v1;
+package com.monarchapis.driver.model;
 
-import com.monarchapis.driver.model.ServiceInfo;
+public interface ClaimNames {
+	public static final String ID = "jti";
+	public static final String SUBJECT = "sub";
 
-public interface OpenApi {
-	public ServiceInfo getServiceInfo(String environmentName, String serviceName, String providerKey);
+	public static final String APPLICATION = "http://monarchapis.com/claims/application";
+	public static final String CLIENT = "http://monarchapis.com/claims/client";
+	public static final String PROVIDER = "http://monarchapis.com/claims/provider";
+	public static final String TOKEN = "http://monarchapis.com/claims/token";
+	public static final String PRINCIPAL = "http://monarchapis.com/claims/principal";
 }

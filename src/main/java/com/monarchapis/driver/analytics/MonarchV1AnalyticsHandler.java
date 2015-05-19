@@ -27,15 +27,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Optional;
+import com.monarchapis.api.v1.client.AnalyticsApi;
+import com.monarchapis.api.v1.client.EventsResource;
+import com.monarchapis.api.v1.model.ObjectData;
+import com.monarchapis.api.v1.model.Reference;
+import com.monarchapis.api.v1.model.ServiceInfo;
 import com.monarchapis.driver.exception.ApiError;
-import com.monarchapis.driver.model.ApiContext;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
+import com.monarchapis.driver.model.ApplicationContext;
+import com.monarchapis.driver.model.ClaimNames;
+import com.monarchapis.driver.model.ClientContext;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
-import com.monarchapis.driver.model.ServiceInfo;
+import com.monarchapis.driver.model.PrincipalContext;
+import com.monarchapis.driver.model.TokenContext;
 import com.monarchapis.driver.model.VersionHolder;
-import com.monarchapis.driver.service.v1.AnalyticsApi;
 import com.monarchapis.driver.service.v1.ServiceInfoResolver;
 import com.monarchapis.driver.servlet.ApiRequest;
 import com.monarchapis.driver.servlet.ApiResponse;
@@ -45,7 +54,7 @@ import com.monarchapis.driver.servlet.ApiResponse;
  * 
  * @author Phil Kedy
  */
-public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
+public class MonarchV1AnalyticsHandler implements AnalyticsHandler, ClaimNames {
 	private static final Logger logger = LoggerFactory.getLogger(MonarchV1AnalyticsHandler.class);
 
 	@Inject
@@ -54,23 +63,40 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 	@Inject
 	private ServiceInfoResolver serviceInfoResolver;
 
+	public MonarchV1AnalyticsHandler() {
+	}
+
+	public MonarchV1AnalyticsHandler(AnalyticsApi analyticsApi, ServiceInfoResolver serviceInfoResolver) {
+		this.analyticsApi = analyticsApi;
+		this.serviceInfoResolver = serviceInfoResolver;
+	}
+
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
 	public void collect(ApiRequest request, ApiResponse response, long ms) {
-		ApiContext context = ApiContext.getCurrent();
+		Claims claims = ClaimsHolder.getCurrent();
 
-		if (context == null || analyticsApi == null || serviceInfoResolver == null) {
+		if (claims == null) {
+			return;
+		}
+
+		Optional<ApplicationContext> application = claims.getAs(ApplicationContext.class, APPLICATION);
+		Optional<ClientContext> client = claims.getAs(ClientContext.class, CLIENT);
+		Optional<TokenContext> token = claims.getAs(TokenContext.class, TOKEN);
+		Optional<PrincipalContext> principal = claims.getAs(PrincipalContext.class, PRINCIPAL);
+
+		if (analyticsApi == null || serviceInfoResolver == null) {
 			return;
 		}
 
 		ServiceInfo serviceInfo = serviceInfoResolver.getServiceInfo(request.getRequestURI());
-		String serviceId = serviceInfo.getService().getId();
-		String providerId = serviceInfo.getProvider().getId();
+		String serviceId = getReferenceId(serviceInfo.getService());
+		String providerId = getReferenceId(serviceInfo.getProvider());
 		String operationName = OperationNameHolder.getCurrent();
 		String version = VersionHolder.getCurrent();
-		String applicationId = context.getApplication() != null ? context.getApplication().getId() : null;
-		String clientId = context.getClient() != null ? context.getClient().getId() : null;
+		String applicationId = application.isPresent() ? application.get().getId() : null;
+		String clientId = client.isPresent() ? client.get().getId() : null;
 		ApiError error = ErrorHolder.getCurrent();
 
 		if (operationName == null) {
@@ -80,7 +106,7 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 		long requestSize = (long) request.getDataSize();
 		long responseSize = (long) response.getDataSize();
 
-		ObjectNode event = JsonNodeFactory.instance.objectNode();
+		ObjectData event = new ObjectData();
 		event.put("request_id", request.getRequestId());
 		event.put("application_id", applicationId);
 		event.put("client_id", clientId);
@@ -94,18 +120,23 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler {
 		event.put("status_code", error == null ? response.getStatus() : error.getStatus());
 		event.put("error_reason", error == null ? "ok" : error.getReason());
 		event.put("cache_hit", false);
-		event.put("token_id", context.getToken() != null ? context.getToken().getId() : null);
-		event.put("user_id", context.getPrincipal() != null ? context.getPrincipal().getId() : null);
+		event.put("token_id", token.isPresent() ? token.get().getId() : null);
+		event.put("user_id", principal.isPresent() ? principal.get().getId() : null);
 		event.put("host", request.getServerName());
 		event.put("port", request.getServerPort());
 		event.put("path", request.getRequestURI());
 		event.put("verb", request.getMethod());
-		event.set("parameters", getParameters(request));
-		event.set("headers", getHeaders(request));
+		event.put("parameters", getParameters(request));
+		event.put("headers", getHeaders(request));
 		event.put("client_ip", request.getIpAddress());
 		event.put("user_agent", request.getHeader("User-Agent"));
 
-		analyticsApi.event("traffic", event);
+		EventsResource events = analyticsApi.getEventsResource();
+		events.collectEvent("traffic", event);
+	}
+
+	private String getReferenceId(Optional<Reference> reference) {
+		return reference.isPresent() ? reference.get().getId() : null;
 	}
 
 	/**
