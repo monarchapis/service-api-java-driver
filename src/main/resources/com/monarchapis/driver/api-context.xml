@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<context:annotation-config />
+
+	<bean id="serviceResolver" class="com.monarchapis.driver.util.SpringServiceResolver" />
+
+	<bean id="jwtDecryptor" class="com.monarchapis.driver.authentication.JwtClaimsProcessor" />
+
+	<util:list id="requestProcessors">
+		<bean class="com.monarchapis.client.authentication.HawkV1RequestProcessor">
+			<constructor-arg value="${monarch.providerKey}" />
+			<constructor-arg value="${monarch.sharedSecret}" />
+			<constructor-arg value="sha256" />
+		</bean>
+		<bean
+			class="com.monarchapis.driver.authentication.EnvironmentRequestProcessor" />
+	</util:list>
+
+	<bean id="hawkV1RequestHasher" class="com.monarchapis.driver.hash.HawkV1RequestHasher" />
+
+	<bean id="hawkV1HasherAlgorithm" class="com.monarchapis.driver.model.HasherAlgorithm">
+		<constructor-arg value="Hawk V1" />
+		<constructor-arg>
+			<array>
+				<value>sha256</value>
+			</array>
+		</constructor-arg>
+	</bean>
+
+	<bean id="requestHasherRegistry" class="com.monarchapis.driver.hash.RequestHasherRegistry" />
+
+	<bean id="configurationBundle"
+		class="com.monarchapis.driver.configuration.ResourceConfigurationBundle">
+		<property name="basename" value="com/monarchapis/driver/Errors" />
+	</bean>
+
+	<bean id="apiErrorFactory"
+		class="com.monarchapis.driver.exception.ConfigurationBundleApiErrorFactory">
+		<property name="moreInfoFormat" value="${error.moreInfoFormat}" />
+	</bean>
+
+	<bean id="authenticationSettings" class="com.monarchapis.driver.model.AuthenticationSettings">
+		<property name="delegateAuthorization" value="${service.delegateAuthorization}" />
+		<property name="bypassRateLimiting" value="${service.bypassRateLimiting}" />
+		<property name="bypassAnalytics" value="${service.bypassAnalytics}" />
+	</bean>
+
+	<bean id="authenticator"
+		class="com.monarchapis.driver.authentication.AuthenticatorV1Impl" />
+
+	<bean id="oauthEndpoints" class="com.monarchapis.driver.model.OAuthEndpoints">
+		<property name="authorizationCodeRequestUrl" value="${oauth.authorizationCode.request.url}" />
+		<property name="authorizationCodeTokenUrl" value="${oauth.authorizationCode.token.url}" />
+		<property name="implicitUrl" value="${oauth.implicit.url}" />
+		<property name="passwordUrl" value="${oauth.password.url}" />
+	</bean>
+
+	<bean id="restClientFactory" class="com.monarchapis.client.rest.RestClientFactory" />
+
+	<bean id="openApi" class="com.monarchapis.api.v1.client.impl.OpenApiImpl">
+		<constructor-arg value="${monarch.url}/open/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg>
+			<util:list />
+		</constructor-arg>
+	</bean>
+
+	<bean id="serviceApi" class="com.monarchapis.api.v1.client.impl.ServiceApiImpl">
+		<constructor-arg value="${monarch.url}/service/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
+	</bean>
+
+	<bean id="analyticsApi" class="com.monarchapis.api.v1.client.impl.AnalyticsApiImpl">
+		<constructor-arg value="${monarch.url}/analytics/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
+	</bean>
+
+	<bean id="commandApi" class="com.monarchapis.api.v1.client.impl.CommandApiImpl">
+		<constructor-arg value="${monarch.url}/command/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
+	</bean>
+
+	<bean id="serviceInfoResolver"
+		class="com.monarchapis.driver.service.v1.SingleServiceInfoResolver">
+		<constructor-arg ref="openApi" />
+		<constructor-arg value="${monarch.environmentName}" />
+		<constructor-arg value="${service.name}" />
+		<constructor-arg value="${monarch.providerKey}" />
+	</bean>
+
+	<bean id="analyticsHandler"
+		class="com.monarchapis.driver.analytics.MonarchV1AnalyticsHandler" />
+</beans>

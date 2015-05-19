@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2015 CapTech Ventures, Inc.
+ * (http://www.captechconsulting.com) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.monarchapis.driver.servlet;
 
 import java.io.IOException;
@@ -10,10 +27,26 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+/**
+ * Wrappers a HttpServletResponse and provides additional methods to support
+ * various authentication schemes such as Hawk.
+ * 
+ * @author Phil Kedy
+ */
 public class ApiResponse extends HttpServletResponseWrapper {
+	/**
+	 * The underlying response.
+	 */
 	protected HttpServletResponse response = null;
-	protected OutputStream servletOutputStream = null;
+
+	/**
+	 * The servlet response output stream.
+	 */
 	protected ServletOutputStreamWrapper stream = null;
+
+	/**
+	 * The print writer if getWriter() is called.
+	 */
 	protected PrintWriter writer = null;
 
 	public ApiResponse(HttpServletResponse response) {
@@ -21,35 +54,21 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		this.response = response;
 	}
 
-	public ServletOutputStreamWrapper createOutputStream() throws IOException {
-		try {
-			servletOutputStream = response.getOutputStream();
-			return new ServletOutputStreamWrapper(servletOutputStream);
-		} catch (Exception ex) {
-			throw new IOException("Unable to construct servlet output stream: " + ex.getMessage(), ex);
-		}
-	}
-
-	public void finishResponse() {
-		try {
-			if (writer != null) {
-				writer.close();
-			} else if (stream != null) {
-				stream.close();
-			}
-		} catch (IOException e) {
-		}
-	}
-
 	@Override
 	public void flushBuffer() throws IOException {
-		stream.flush();
+		if (stream != null) {
+			stream.flush();
+		}
+
+		if (writer != null) {
+			writer.flush();
+		}
 	}
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
 		if (writer != null) {
-			throw new IllegalStateException("getOutputStream() has already been called!");
+			throw new IllegalStateException("getWriter() has already been called!");
 		}
 
 		if (stream == null) {
@@ -75,10 +94,11 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		return (writer);
 	}
 
-	public OutputStream getServletOutputStream() {
-		return servletOutputStream;
-	}
-
+	/**
+	 * Calculates the data size of the response.
+	 * 
+	 * @return the response data size.
+	 */
 	public int getDataSize() {
 		int size = 0;
 
@@ -103,5 +123,22 @@ public class ApiResponse extends HttpServletResponseWrapper {
 		}
 
 		return size;
+	}
+
+	/**
+	 * Creates the underlying ServletOutputStreamWrapper.
+	 * 
+	 * @return the ServletOutputStreamWrapper.
+	 * @throws IOException
+	 *             when the wrapper could not be create.
+	 */
+	private ServletOutputStreamWrapper createOutputStream() throws IOException {
+		try {
+			OutputStream servletOutputStream = response.getOutputStream();
+
+			return new ServletOutputStreamWrapper(servletOutputStream);
+		} catch (Exception ex) {
+			throw new IOException("Unable to construct servlet output stream: " + ex.getMessage(), ex);
+		}
 	}
 }
