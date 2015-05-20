@@ -114,8 +114,8 @@ public class AuthenticatorV1Impl implements Authenticator {
 			throw apiErrorFactory.exception("invalidAccessToken");
 		}
 
-		// Only check delegated permissions if a token is part of the API
-		// context.
+		// Only check delegated permissions if a token is included in the
+		// claims.
 		if (delegation && claimSet.hasClaim(ClaimNames.TOKEN) && !claimSet.hasTokenPermission(delegated)) {
 			throw apiErrorFactory.exception("invalidAccessToken");
 		}
