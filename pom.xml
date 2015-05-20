@@ -2,8 +2,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.monarchapis</groupId>
-	<artifactId>service-api-java-driver</artifactId>
-	<version>0.8.1</version>
+	<artifactId>service-java-driver</artifactId>
+	<version>0.8.2</version>
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -11,7 +11,7 @@
 		<version>9</version>
 	</parent>
 
-	<name>Service API driver for Java / Scala</name>
+	<name>Service Driver for Java / Scala</name>
 	<url>http://monarchapis.com/docs/service-drivers</url>
 	<description>Service Driver to authenticate and authorize requests in your API using the Monarch API Manager.</description>
 
@@ -21,13 +21,13 @@
 	</organization>
 
 	<scm>
-		<url>https://github.com/monarchapis/service-api-java-driver</url>
-		<connection>scm:git:git://github.com/monarchapis/service-api-java-driver.git</connection>
-		<developerConnection>scm:git:git@github.com:monarchapis/service-api-java-driver.git</developerConnection>
+		<url>https://github.com/monarchapis/service-java-driver</url>
+		<connection>scm:git:git://github.com/monarchapis/service-java-driver.git</connection>
+		<developerConnection>scm:git:git@github.com:monarchapis/service-java-driver.git</developerConnection>
 	</scm>
 
 	<issueManagement>
-		<url>https://github.com/monarchapis/service-api-java-driver/issues</url>
+		<url>https://github.com/monarchapis/service-java-driver/issues</url>
 		<system>GitHub Issues</system>
 	</issueManagement>
 
