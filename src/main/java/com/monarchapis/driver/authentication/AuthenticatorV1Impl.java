@@ -104,32 +104,20 @@ public class AuthenticatorV1Impl implements Authenticator {
 			Claim[] claims) {
 		Claims claimSet = getClaims(requestWeight);
 
-		if (claimSet == null) {
+		if (claimSet == null || !claimSet.hasClientPermission(client)) {
 			throw apiErrorFactory.exception("forbidden");
 		}
 
-		if (client != null && client.length > 0) {
-			if (!claimSet.hasClientPermission(client)) {
-				throw apiErrorFactory.exception("forbidden");
-			}
+		boolean delegation = delegated != null && delegated.length > 0;
+
+		if ((user || delegation) && !claimSet.hasClaim(ClaimNames.SUBJECT)) {
+			throw apiErrorFactory.exception("invalidAccessToken");
 		}
 
 		// Only check delegated permissions if a token is part of the API
 		// context.
-		if (delegated != null && delegated.length > 0 && claimSet.hasClaim(ClaimNames.TOKEN)) {
-			if (!claimSet.hasClaim(ClaimNames.SUBJECT)) {
-				throw apiErrorFactory.exception("invalidAccessToken");
-			}
-
-			if (!claimSet.hasTokenPermission(delegated)) {
-				throw apiErrorFactory.exception("invalidAccessToken");
-			}
-		}
-
-		if (user) {
-			if (!claimSet.hasClaim(ClaimNames.SUBJECT)) {
-				throw apiErrorFactory.exception("invalidAccessToken");
-			}
+		if (delegation && claimSet.hasClaim(ClaimNames.TOKEN) && !claimSet.hasTokenPermission(delegated)) {
+			throw apiErrorFactory.exception("invalidAccessToken");
 		}
 
 		if (claims.length > 0) {
