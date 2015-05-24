@@ -77,6 +77,12 @@
 		<constructor-arg ref="restClientFactory" />
 		<constructor-arg ref="requestProcessors" />
 	</bean>
+	
+	<bean id="managementApi" class="com.monarchapis.api.v1.client.impl.ManagementApiImpl">
+		<constructor-arg value="${monarch.url}/management/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
+	</bean>
 
 	<bean id="analyticsApi" class="com.monarchapis.api.v1.client.impl.AnalyticsApiImpl">
 		<constructor-arg value="${monarch.url}/analytics/v1" />
