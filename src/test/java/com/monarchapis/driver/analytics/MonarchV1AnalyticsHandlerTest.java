@@ -37,6 +37,7 @@ import org.mockito.stubbing.Answer;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.monarchapis.api.v1.client.AnalyticsApi;
 import com.monarchapis.api.v1.client.EventsResource;
 import com.monarchapis.api.v1.model.ObjectData;
@@ -237,5 +238,20 @@ public class MonarchV1AnalyticsHandlerTest {
 		ObjectNode headers = (ObjectNode) objectData.get("headers");
 		assertEquals("value1", headers.path("test1").asText());
 		assertEquals("value2", headers.path("test2").asText());
+	}
+
+	@Test
+	public void testWillIgnorePredefinedUriPatterms() {
+		when(request.getRequestURI()).thenReturn("/health");
+		when(request.getContextPath()).thenReturn("");
+		handler.setIgnoreUriPatterns(Sets.newHashSet("/health"));
+
+		handler.collect(request, response, 100);
+		verify(serviceInfoResolver, never()).getServiceInfo(anyString());
+
+		handler.setIgnoreUriPatterns(Sets.newHashSet(".*other.*"));
+
+		handler.collect(request, response, 100);
+		verify(serviceInfoResolver, times(1)).getServiceInfo(anyString());
 	}
 }

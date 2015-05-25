@@ -13,6 +13,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.collect.Sets;
 import com.monarchapis.api.v1.client.AnalyticsApi;
 import com.monarchapis.api.v1.client.CommandApi;
 import com.monarchapis.api.v1.client.ManagementApi;
@@ -247,6 +248,9 @@ public class MonarchConfigurer {
 
 	@Bean
 	public AnalyticsHandler analyticsHandler(AnalyticsApi analyticsApi, ServiceInfoResolver serviceInfoResolver) {
-		return new MonarchV1AnalyticsHandler(analyticsApi, serviceInfoResolver);
+		MonarchV1AnalyticsHandler handler = new MonarchV1AnalyticsHandler(analyticsApi, serviceInfoResolver);
+		handler.setIgnoreUriPatterns(Sets.newHashSet("/health"));
+
+		return handler;
 	}
 }
