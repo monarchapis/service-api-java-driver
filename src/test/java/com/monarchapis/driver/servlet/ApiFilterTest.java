@@ -43,6 +43,7 @@ import org.mockito.stubbing.Answer;
 
 import com.google.common.base.Optional;
 import com.monarchapis.driver.analytics.AnalyticsHandler;
+import com.monarchapis.driver.model.AuthenticationSettings;
 import com.monarchapis.driver.model.Claims;
 import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
@@ -71,6 +72,11 @@ public class ApiFilterTest {
 	@Before
 	public void setup() throws IOException {
 		ServiceResolver.setInstance(serviceResolver);
+
+		AuthenticationSettings settings = new AuthenticationSettings();
+		settings.setBypassAnalytics(false);
+
+		when(serviceResolver.required(AuthenticationSettings.class)).thenReturn(settings);
 
 		when(request.getInputStream()).thenAnswer(new Answer<InputStream>() {
 			@Override

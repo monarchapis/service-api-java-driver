@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
 import com.monarchapis.driver.analytics.AnalyticsHandler;
 import com.monarchapis.driver.authentication.ClaimsProcessor;
+import com.monarchapis.driver.model.AuthenticationSettings;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
 import com.monarchapis.driver.model.Claims;
 import com.monarchapis.driver.model.ClaimsHolder;
@@ -124,7 +125,9 @@ public class ApiFilter implements Filter {
 		try {
 			long ms = System.currentTimeMillis() - begin;
 
-			boolean bypassAnalytics = BooleanUtils.isTrue(BypassAnalyticsHolder.getCurrent());
+			AuthenticationSettings settings = ServiceResolver.getInstance().required(AuthenticationSettings.class);
+			boolean bypassAnalytics = settings.isBypassAnalytics()
+					|| BooleanUtils.isTrue(BypassAnalyticsHolder.getCurrent());
 			Optional<AnalyticsHandler> handler = ServiceResolver.getInstance().optional(AnalyticsHandler.class);
 
 			if (bypassAnalytics || !handler.isPresent()) {
