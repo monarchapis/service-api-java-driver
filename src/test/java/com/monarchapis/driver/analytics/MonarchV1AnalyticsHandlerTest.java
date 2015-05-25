@@ -95,7 +95,7 @@ public class MonarchV1AnalyticsHandlerTest {
 		ServiceInfo serviceInfo = new ServiceInfo();
 		serviceInfo.setService(Optional.of(reference));
 		serviceInfo.setProvider(Optional.of(reference));
-		when(serviceInfoResolver.getServiceInfo("/test")).thenReturn(serviceInfo);
+		when(serviceInfoResolver.getServiceInfo(anyString())).thenReturn(serviceInfo);
 
 		final Vector<String> headerNames = new Vector<String>();
 		headerNames.add("test1");
