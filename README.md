@@ -1,4 +1,4 @@
-Monarch - Service API Driver for Java
+Monarch - Service Driver for Java
 =====================================
 
 This library is used as a plugin to authenticate and authorize requests using the Monarch API Manager.

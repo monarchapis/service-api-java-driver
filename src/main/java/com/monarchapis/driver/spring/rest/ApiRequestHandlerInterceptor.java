@@ -21,7 +21,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,6 +38,7 @@ import com.monarchapis.driver.authentication.Authenticator;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
 import com.monarchapis.driver.model.VersionHolder;
+import com.monarchapis.driver.util.ServiceResolver;
 
 /**
  * Intercepts Spring Rest controller methods and invokes Monarch if
@@ -48,12 +48,6 @@ import com.monarchapis.driver.model.VersionHolder;
  */
 @Component
 public class ApiRequestHandlerInterceptor extends HandlerInterceptorAdapter {
-	/**
-	 * The authenticator implementation.
-	 */
-	@Inject
-	private Authenticator authenticator;
-
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		if (handler instanceof HandlerMethod) {
@@ -105,6 +99,7 @@ public class ApiRequestHandlerInterceptor extends HandlerInterceptorAdapter {
 			boolean user = authorize.user();
 			Claim[] claims = authorize.claims();
 
+			Authenticator authenticator = ServiceResolver.getInstance().required(Authenticator.class);
 			authenticator.performAccessChecks(weight, client, delegated, user, claims);
 		}
 
@@ -135,9 +130,5 @@ public class ApiRequestHandlerInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		return annotation;
-	}
-
-	public void setAuthenticator(Authenticator authenticator) {
-		this.authenticator = authenticator;
 	}
 }

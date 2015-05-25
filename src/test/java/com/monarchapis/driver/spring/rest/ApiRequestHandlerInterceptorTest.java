@@ -46,6 +46,7 @@ import com.monarchapis.driver.authentication.Authenticator;
 import com.monarchapis.driver.model.BypassAnalyticsHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
 import com.monarchapis.driver.model.VersionHolder;
+import com.monarchapis.driver.util.ServiceResolver;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApiRequestHandlerInterceptorTest {
@@ -64,8 +65,13 @@ public class ApiRequestHandlerInterceptorTest {
 	@Mock
 	private HandlerMethod handler;
 
+	@Mock
+	private ServiceResolver serviceResolver;
+
 	@Before
 	public void setup() {
+		ServiceResolver.setInstance(serviceResolver);
+		when(serviceResolver.required(Authenticator.class)).thenReturn(authenticator);
 	}
 
 	@After
@@ -73,6 +79,7 @@ public class ApiRequestHandlerInterceptorTest {
 		OperationNameHolder.remove();
 		VersionHolder.remove();
 		BypassAnalyticsHolder.remove();
+		ServiceResolver.setInstance(null);
 	}
 
 	@Test

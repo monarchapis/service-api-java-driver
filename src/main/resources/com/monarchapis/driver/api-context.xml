@@ -11,7 +11,8 @@
 
 	<bean id="serviceResolver" class="com.monarchapis.driver.util.SpringServiceResolver" />
 
-	<bean id="jwtDecryptor" class="com.monarchapis.driver.authentication.JwtClaimsProcessor" />
+	<bean id="jwtDecryptor"
+		class="com.monarchapis.driver.authentication.JwtClaimsProcessor" />
 
 	<util:list id="requestProcessors">
 		<bean class="com.monarchapis.client.authentication.HawkV1RequestProcessor">
@@ -78,6 +79,12 @@
 		<constructor-arg ref="requestProcessors" />
 	</bean>
 
+	<bean id="managementApi" class="com.monarchapis.api.v1.client.impl.ManagementApiImpl">
+		<constructor-arg value="${monarch.url}/management/v1" />
+		<constructor-arg ref="restClientFactory" />
+		<constructor-arg ref="requestProcessors" />
+	</bean>
+
 	<bean id="analyticsApi" class="com.monarchapis.api.v1.client.impl.AnalyticsApiImpl">
 		<constructor-arg value="${monarch.url}/analytics/v1" />
 		<constructor-arg ref="restClientFactory" />
@@ -99,5 +106,11 @@
 	</bean>
 
 	<bean id="analyticsHandler"
-		class="com.monarchapis.driver.analytics.MonarchV1AnalyticsHandler" />
+		class="com.monarchapis.driver.analytics.MonarchV1AnalyticsHandler">
+		<property name="ignoreUriPatterns">
+			<util:set>
+				<value>/health</value>
+			</util:set>
+		</property>
+	</bean>
 </beans>

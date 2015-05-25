@@ -20,25 +20,31 @@ package com.monarchapis.driver.analytics;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Enumeration;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+
+import jersey.repackaged.com.google.common.collect.Sets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 import com.monarchapis.api.v1.client.AnalyticsApi;
 import com.monarchapis.api.v1.client.EventsResource;
 import com.monarchapis.api.v1.model.ObjectData;
 import com.monarchapis.api.v1.model.Reference;
 import com.monarchapis.api.v1.model.ServiceInfo;
 import com.monarchapis.driver.exception.ApiError;
-import com.monarchapis.driver.model.Claims;
-import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.ApplicationContext;
 import com.monarchapis.driver.model.ClaimNames;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.ClientContext;
 import com.monarchapis.driver.model.ErrorHolder;
 import com.monarchapis.driver.model.OperationNameHolder;
@@ -63,6 +69,8 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler, ClaimNames {
 	@Inject
 	private ServiceInfoResolver serviceInfoResolver;
 
+	private Set<Pattern> ignoreUriPatterns;
+
 	public MonarchV1AnalyticsHandler() {
 	}
 
@@ -77,14 +85,25 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler, ClaimNames {
 	public void collect(ApiRequest request, ApiResponse response, long ms) {
 		Claims claims = ClaimsHolder.getCurrent();
 
-		if (claims == null) {
-			return;
+		if (ignoreUriPatterns != null) {
+			String uri = request.getRequestURI();
+			String context = request.getContextPath();
+
+			if (context != null && context.length() > 0) {
+				uri = uri.substring(context.length());
+			}
+
+			for (Pattern pattern : ignoreUriPatterns) {
+				if (pattern.matcher(uri).matches()) {
+					return;
+				}
+			}
 		}
 
-		Optional<ApplicationContext> application = claims.getAs(ApplicationContext.class, APPLICATION);
-		Optional<ClientContext> client = claims.getAs(ClientContext.class, CLIENT);
-		Optional<TokenContext> token = claims.getAs(TokenContext.class, TOKEN);
-		Optional<PrincipalContext> principal = claims.getAs(PrincipalContext.class, PRINCIPAL);
+		Optional<ApplicationContext> application = getClaimObject(claims, ApplicationContext.class, APPLICATION);
+		Optional<ClientContext> client = getClaimObject(claims, ClientContext.class, CLIENT);
+		Optional<TokenContext> token = getClaimObject(claims, TokenContext.class, TOKEN);
+		Optional<PrincipalContext> principal = getClaimObject(claims, PrincipalContext.class, PRINCIPAL);
 
 		if (analyticsApi == null || serviceInfoResolver == null) {
 			return;
@@ -133,6 +152,14 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler, ClaimNames {
 
 		EventsResource events = analyticsApi.getEventsResource();
 		events.collectEvent("traffic", event);
+	}
+
+	private <T> Optional<T> getClaimObject(Claims claims, Class<T> clazz, String claimName) {
+		if (claims == null) {
+			return Optional.absent();
+		}
+
+		return claims.getAs(clazz, claimName);
 	}
 
 	private String getReferenceId(Optional<Reference> reference) {
@@ -207,5 +234,20 @@ public class MonarchV1AnalyticsHandler implements AnalyticsHandler, ClaimNames {
 	 */
 	public void setServiceInfoResolver(ServiceInfoResolver serviceInfoResolver) {
 		this.serviceInfoResolver = serviceInfoResolver;
+	}
+
+	public void setIgnoreUriPatterns(Set<String> patterns) {
+		if (patterns != null && patterns.size() > 0) {
+			Iterable<Pattern> compiled = Iterables.transform(patterns, new Function<String, Pattern>() {
+				@Override
+				public Pattern apply(String pattern) {
+					return Pattern.compile(pattern);
+				}
+			});
+
+			ignoreUriPatterns = Sets.newHashSet(compiled);
+		} else {
+			ignoreUriPatterns = null;
+		}
 	}
 }
