@@ -109,7 +109,19 @@
 		class="com.monarchapis.driver.analytics.MonarchV1AnalyticsHandler">
 		<property name="ignoreUriPatterns">
 			<util:set>
-				<value>/health</value>
+				<value>^/info$</value>
+				<value>^/env$</value>
+				<value>^/env/.*$</value>
+				<value>^/shutdown$</value>
+				<value>^/health$</value>
+				<value>^/beans$</value>
+				<value>^/dump$</value>
+				<value>^/mappings$</value>
+				<value>^/metrics$</value>
+				<value>^/metrics/.*$</value>
+				<value>^/configprops$</value>
+				<value>^/autoconfig$</value>
+				<value>^/trace$</value>
 			</util:set>
 		</property>
 	</bean>

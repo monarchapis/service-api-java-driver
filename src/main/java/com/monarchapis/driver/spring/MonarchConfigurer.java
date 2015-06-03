@@ -249,7 +249,20 @@ public class MonarchConfigurer {
 	@Bean
 	public AnalyticsHandler analyticsHandler(AnalyticsApi analyticsApi, ServiceInfoResolver serviceInfoResolver) {
 		MonarchV1AnalyticsHandler handler = new MonarchV1AnalyticsHandler(analyticsApi, serviceInfoResolver);
-		handler.setIgnoreUriPatterns(Sets.newHashSet("/health"));
+		handler.setIgnoreUriPatterns(Sets.newHashSet(//
+				"^/info$", //
+				"^/env$", //
+				"^/env/.*$", //
+				"^/shutdown$", //
+				"^/health$", //
+				"^/beans$", //
+				"^/dump$", //
+				"^/mappings$", //
+				"^/metrics$", //
+				"^/metrics/.*$", //
+				"^/configprops$", //
+				"^/autoconfig$", //
+				"^/trace$"));
 
 		return handler;
 	}

@@ -124,12 +124,13 @@ public class AuthenticatorV1Impl implements Authenticator {
 			boolean found = false;
 
 			for (Claim claim : claims) {
-				Optional<String> _value = claimSet.getString(claim.type());
-
-				if (_value.isPresent()) {
-					String value = _value.get();
-
-					if (value.equals(claim.value())) {
+				if ("*".equals(claim.value())) {
+					if (claimSet.hasClaim(claim.type())) {
+						found = true;
+						break;
+					}
+				} else {
+					if (claimSet.hasValueInClaim(claim.value(), claim.type())) {
 						found = true;
 						break;
 					}

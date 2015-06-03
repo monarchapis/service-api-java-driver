@@ -1,5 +1,6 @@
 package com.monarchapis.driver.spring.rest;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -12,5 +13,10 @@ public class MonarchWebMvcConfigurer extends WebMvcConfigurerAdapter {
 	public void addInterceptors(InterceptorRegistry registry) {
 		ApiRequestHandlerInterceptor interceptor = new ApiRequestHandlerInterceptor();
 		registry.addInterceptor(interceptor).addPathPatterns("/**");
+	}
+
+	@Bean
+	public ApiErrorResponseEntityExceptionHandler exceptionHandler() {
+		return new ApiErrorResponseEntityExceptionHandler();
 	}
 }
