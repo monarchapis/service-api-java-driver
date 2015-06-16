@@ -25,6 +25,15 @@ package com.monarchapis.driver.exception;
  */
 public interface ApiErrorFactory {
 	/**
+	 * Determines if there is an specified error for a given reason.
+	 * 
+	 * @param errorReason
+	 *            The error reason
+	 * @return true if a specific error can be created, false otherwise.
+	 */
+	boolean hasError(String errorReason);
+	
+	/**
 	 * Returns the API error based on the error reason.
 	 * 
 	 * @param errorReason

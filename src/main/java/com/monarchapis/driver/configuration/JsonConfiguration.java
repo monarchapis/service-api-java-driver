@@ -84,6 +84,13 @@ public class JsonConfiguration implements LoadableConfiguration {
 	}
 
 	@Override
+	public boolean hasValue(String path) {
+		JsonNode node = getPathNode(path);
+
+		return node.isValueNode();
+	}
+
+	@Override
 	public Optional<String> getString(String path, Object... args) {
 		JsonNode node = getPathNode(path);
 

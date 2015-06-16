@@ -41,6 +41,8 @@ import com.monarchapis.driver.servlet.ApiRequest;
 public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 	private static final Logger logger = LoggerFactory.getLogger(ConfigurationBundleApiErrorFactory.class);
 
+	private static final String[] EMPTY_STRING_ARRAY = new String[0];
+
 	/**
 	 * The configuration bundle.
 	 */
@@ -66,6 +68,11 @@ public class ConfigurationBundleApiErrorFactory implements ApiErrorFactory {
 
 	public void setMoreInfoFormat(String moreInfoFormat) {
 		this.moreInfoFormat = moreInfoFormat;
+	}
+
+	@Override
+	public boolean hasError(String errorReason) {
+		return configurationBundle.hasValue(errorReason, EMPTY_STRING_ARRAY);
 	}
 
 	@Override

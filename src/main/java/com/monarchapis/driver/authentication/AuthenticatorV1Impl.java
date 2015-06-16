@@ -38,13 +38,15 @@ import com.monarchapis.api.v1.model.HttpHeader;
 import com.monarchapis.api.v1.model.PayloadHashes;
 import com.monarchapis.api.v1.model.StringMap;
 import com.monarchapis.driver.annotation.Claim;
+import com.monarchapis.driver.exception.ApiError;
+import com.monarchapis.driver.exception.ApiErrorException;
 import com.monarchapis.driver.exception.ApiErrorFactory;
 import com.monarchapis.driver.hash.RequestHasher;
 import com.monarchapis.driver.hash.RequestHasherRegistry;
-import com.monarchapis.driver.model.Claims;
-import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.AuthenticationSettings;
 import com.monarchapis.driver.model.ClaimNames;
+import com.monarchapis.driver.model.Claims;
+import com.monarchapis.driver.model.ClaimsHolder;
 import com.monarchapis.driver.model.HasherAlgorithm;
 import com.monarchapis.driver.model.HttpResponseHolder;
 import com.monarchapis.driver.servlet.ApiRequest;
@@ -175,8 +177,20 @@ public class AuthenticatorV1Impl implements Authenticator {
 			}
 
 			if (authResponse.getCode() != 200) {
-				// Map the exception based on the error reason
-				throw apiErrorFactory.exception(authResponse.getReason().or("internalError"));
+				String errorReason = authResponse.getReason().or("internalError");
+
+				if (apiErrorFactory.hasError(errorReason)) {
+					// Map the exception based on the error reason
+					throw apiErrorFactory.exception(errorReason);
+				} else {
+					ApiError error = new ApiError( //
+							authResponse.getCode(), //
+							errorReason, //
+							authResponse.getMessage().orNull(), //
+							authResponse.getDeveloperMessage().orNull(), //
+							authResponse.getErrorCode().orNull());
+					throw new ApiErrorException(error);
+				}
 			}
 		}
 

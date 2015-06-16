@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import jersey.repackaged.com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import com.monarchapis.api.v1.client.AnalyticsApi;
 import com.monarchapis.api.v1.client.EventsResource;
 import com.monarchapis.api.v1.model.ObjectData;

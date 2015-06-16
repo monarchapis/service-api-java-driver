@@ -27,6 +27,15 @@ import com.google.common.base.Optional;
  */
 public interface Configuration {
 	/**
+	 * Determines if a property exists for a given path.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @return true if the path exists, false otherwise.
+	 */
+	public boolean hasValue(String path);
+
+	/**
 	 * Retrieves the property value as a string.
 	 * 
 	 * @param path

@@ -34,6 +34,15 @@ public abstract class AbstractConfigurationBundleTest {
 	}
 
 	@Test
+	public void testHasValue() {
+		assertFalse(bundle.hasValue("string1", noVariants));
+		assertTrue(bundle.hasValue("string1", enVariants));
+
+		assertFalse(bundle.hasValue("doesnotexist", noVariants));
+		assertFalse(bundle.hasValue("doesnotexist", enVariants));
+	}
+
+	@Test
 	public void testGetStringNoVariants() {
 		Optional<String> actual = bundle.getString("string1", noVariants);
 		assertEquals(Optional.of("string"), actual);

@@ -73,6 +73,18 @@ public class ApiErrorResponseEntityExceptionHandler extends ResponseEntityExcept
 		return new ResponseEntity<ApiError>(setErrorHolder(error), status);
 	}
 
+	@ExceptionHandler(com.monarchapis.api.exception.ApiErrorException.class)
+	public ResponseEntity<ApiError> handleApiErrorException(HttpServletRequest req,
+			com.monarchapis.api.exception.ApiErrorException ex) {
+		com.monarchapis.api.exception.ApiError error = ex.getError();
+		HttpStatus status = HttpStatus.valueOf(error.getCode());
+
+		ApiError e = new ApiError(error.getCode(), error.getReason(), error.getMessage(), error.getDeveloperMessage(),
+				error.getErrorCode(), error.getMoreInfo());
+
+		return new ResponseEntity<ApiError>(setErrorHolder(e), status);
+	}
+
 	protected ResponseEntity<Object> handleNoSuchRequestHandlingMethod(NoSuchRequestHandlingMethodException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		return errorResponse("notFound", headers);

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.monarchapis.driver.exception.ApiErrorFactory;
 import com.monarchapis.driver.spring.MonarchConfigurer;
 
 @Import(MonarchConfigurer.class)
@@ -16,7 +17,10 @@ public class MonarchWebMvcConfigurer extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public ApiErrorResponseEntityExceptionHandler exceptionHandler() {
-		return new ApiErrorResponseEntityExceptionHandler();
+	public ApiErrorResponseEntityExceptionHandler exceptionHandler(ApiErrorFactory errorFactory) {
+		ApiErrorResponseEntityExceptionHandler handler = new ApiErrorResponseEntityExceptionHandler();
+		handler.setApiErrorFactory(errorFactory);
+
+		return handler;
 	}
 }

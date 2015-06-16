@@ -27,6 +27,17 @@ import com.google.common.base.Optional;
  */
 public interface ConfigurationBundle {
 	/**
+	 * Determines if there is an specified error for a given path.
+	 * 
+	 * @param path
+	 *            The property path
+	 * @param variants
+	 *            The variants to attempt to find
+	 * @return true if the path exists, false otherwise.
+	 */
+	public boolean hasValue(String path, String[] variants);
+
+	/**
 	 * Retrieves the property value as a string.
 	 * 
 	 * @param path

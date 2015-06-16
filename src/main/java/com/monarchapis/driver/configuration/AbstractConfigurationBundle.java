@@ -77,6 +77,23 @@ public abstract class AbstractConfigurationBundle implements ConfigurationBundle
 	}
 
 	@Override
+	public boolean hasValue(String path, String[] variants) {
+		for (String variant : variants) {
+			Configuration configs[] = getConfigurationsForVariant(variant);
+
+			if (configs != null && configs.length > 0) {
+				for (int i = configs.length - 1; i >= 0; i--) {
+					if (configs[i].hasValue(path)) {
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public Optional<String> getString(String path, String[] variants, Object... args) {
 		for (String variant : variants) {
 			Optional<String> value = getVariantString(path, variant, args);

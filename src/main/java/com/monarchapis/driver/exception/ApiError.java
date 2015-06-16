@@ -97,12 +97,12 @@ public class ApiError {
 		return status;
 	}
 
-	public void setStatus(int code) {
-		this.status = code;
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
-	public ApiError code(int code) {
-		setStatus(code);
+	public ApiError status(int status) {
+		setStatus(status);
 		return this;
 	}
 

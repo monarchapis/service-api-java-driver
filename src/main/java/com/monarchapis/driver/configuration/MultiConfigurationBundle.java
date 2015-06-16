@@ -78,6 +78,17 @@ public class MultiConfigurationBundle implements ConfigurationBundle {
 	}
 
 	@Override
+	public boolean hasValue(String path, String[] variants) {
+		for (int i = bundles.length - 1; i >= 0; i--) {
+			if (bundles[i].hasValue(path, variants)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	@Override
 	public Optional<String> getString(String path, String[] variants, Object... args) {
 		Optional<String> value = Optional.absent();
 
